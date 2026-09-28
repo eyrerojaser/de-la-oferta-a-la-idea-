@@ -1,0 +1,2553 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>De Idea a Oferta</title>
+<meta name="description" content="Convierte tu idea, habilidad o negocio en una oferta lista para vender, con IA.">
+<meta name="theme-color" content="#0E3B4A">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Idea a Oferta">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   TOKENS
+   ========================================================= */
+:root{
+  --bg:#F1F3EE; --surface:#FFFFFF; --ink:#1C2723; --muted:#5E6B66;
+  --line:#D3DAD2; --soft:#E5ECE6; --accent:#E3A019; --accent-ink:#1C2723;
+  --deep:#24574C; --deep-ink:#FFFFFF; --danger:#B23A2E;
+  --display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body:"Instrument Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --r-sm:8px; --r-md:14px; --r-lg:22px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#121816; --surface:#1B2320; --ink:#E7ECE8; --muted:#9AA8A2;
+    --line:#2F3A36; --soft:#1F2B27; --accent:#F0B437; --accent-ink:#141A18;
+    --deep:#5FB39F; --deep-ink:#0F1513; --danger:#E8766A; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121816; --surface:#1B2320; --ink:#E7ECE8; --muted:#9AA8A2;
+  --line:#2F3A36; --soft:#1F2B27; --accent:#F0B437; --accent-ink:#141A18;
+  --deep:#5FB39F; --deep-ink:#0F1513; --danger:#E8766A; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* =========================================================
+   LAYOUT
+   ========================================================= */
+.wrap{max-width:780px;margin:0 auto;padding:0 20px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 0}
+.brand{font-family:var(--display);font-weight:800;font-size:1.15rem;letter-spacing:-.01em}
+.brand span{color:var(--deep)}
+.btn-project{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;font-weight:600;cursor:pointer}
+.btn-project .dot{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.btn-project.saved .dot{background:var(--accent)}
+
+/* stage rail */
+.rail{display:flex;gap:8px;overflow-x:auto;padding:4px 0 14px;margin:0 -20px;padding-left:20px;padding-right:20px;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.stage{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:8px 14px 8px 8px;border-radius:999px;background:var(--soft);color:var(--muted);font-size:.9rem;white-space:nowrap}
+.stage .n{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:700;background:var(--surface);border:1.5px solid var(--line)}
+.stage.current{background:var(--deep);color:var(--deep-ink)}
+.stage.current .n{background:var(--deep-ink);color:var(--deep);border-color:transparent}
+.stage.done .n{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.stage small{opacity:.75}
+
+/* hero */
+.hero{padding:28px 0 8px}
+.hero h1{font-family:var(--display);font-weight:800;font-size:clamp(2rem,6vw,3.3rem);line-height:1.02;letter-spacing:-.03em;margin:0 0 14px;max-width:16ch}
+.hero p{color:var(--muted);max-width:56ch;margin:0}
+
+/* questions */
+.qs{margin:34px 0 0;padding:0;list-style:none;counter-reset:q}
+.q{background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:22px 22px 24px;margin-bottom:14px;display:grid;grid-template-columns:44px 1fr;gap:4px 14px}
+.q .qn{font-family:var(--display);font-weight:800;font-size:1.6rem;line-height:1;color:var(--deep);padding-top:2px}
+.q .qn small{display:block;font-size:.7rem;font-weight:500;color:var(--muted);margin-top:4px}
+.q label.ql,.q .ql{font-weight:600;font-size:1.05rem;display:block;margin-bottom:4px}
+.q .help{color:var(--muted);font-size:.9rem;margin:0 0 12px}
+.q .body{min-width:0}
+.q.missing{border-color:var(--danger)}
+textarea,input[type=text],select{width:100%;background:var(--bg);border:1.5px solid var(--line);border-radius:var(--r-md);padding:12px 14px;resize:vertical}
+textarea{min-height:92px}
+textarea:focus,input:focus,select:focus{border-color:var(--deep);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--deep) 25%,transparent)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--bg);border-radius:999px;padding:9px 16px;cursor:pointer;font-weight:500;text-align:left}
+.chip[aria-checked="true"]{background:var(--deep);border-color:var(--deep);color:var(--deep-ink)}
+.chip small{display:block;font-size:.78rem;opacity:.75;font-weight:400}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row2 label{font-size:.85rem;color:var(--muted);display:block;margin-bottom:4px}
+.gap{margin-top:10px}
+
+/* action */
+.action{padding:14px 0 10px;display:flex;flex-wrap:wrap;align-items:center;gap:14px}
+.btn{border:0;border-radius:var(--r-md);padding:15px 22px;font-weight:600;font-size:1.02rem;cursor:pointer}
+.btn-primary{background:var(--deep);color:var(--deep-ink)}
+.btn-gold{background:var(--accent);color:var(--accent-ink)}
+.btn-ghost{background:transparent;border:1.5px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.note{color:var(--muted);font-size:.9rem}
+.note.err{color:var(--danger)}
+
+/* loading */
+.thinking{display:none;margin:22px 0;padding:22px;border-radius:var(--r-lg);background:var(--soft);align-items:center;gap:16px}
+.thinking.on{display:flex}
+.spin{width:26px;height:26px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--deep);animation:spin 1s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.thinking .msg{flex:1;font-weight:500}
+
+/* result */
+.result{display:none;padding:34px 0 20px;border-top:2px solid var(--ink);margin-top:30px}
+.result.on{display:block}
+.result h2{font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,4.5vw,2.3rem);letter-spacing:-.02em;margin:0 0 12px;line-height:1.05}
+.start-tag{display:inline-block;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:4px 12px;font-weight:600;font-size:.85rem;margin-bottom:14px}
+.summary{font-size:1.12rem;max-width:62ch;margin:0 0 24px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:38px}
+.fact{background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-md);padding:16px}
+.fact h3{font-size:.85rem;color:var(--muted);font-weight:600;margin:0 0 6px}
+.fact ul{margin:0;padding-left:18px}
+.fact p{margin:0}
+.paths-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.paths-head h2{margin:0}
+.paths{display:grid;gap:14px}
+.path{position:relative;background:var(--surface);border:2px solid var(--line);border-radius:var(--r-lg);padding:22px 22px 18px;display:grid;grid-template-columns:52px 1fr;gap:4px 16px;transition:border-color .15s}
+.path .letter{font-family:var(--display);font-weight:800;font-size:2.4rem;line-height:.9;color:var(--muted)}
+.path h3{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:-.01em;margin:0 0 4px;line-height:1.15}
+.path .what{margin:0 0 12px}
+.path dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0 0 14px;font-size:.93rem}
+.path dt{color:var(--muted);font-weight:600}
+.path dd{margin:0}
+.path .meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.tag{background:var(--soft);border-radius:999px;padding:3px 10px;font-size:.82rem}
+.reco{position:absolute;top:-12px;right:18px;background:var(--ink);color:var(--bg);border-radius:999px;padding:3px 11px;font-size:.78rem;font-weight:600}
+.path.chosen{border-color:var(--accent)}
+.path.chosen .letter{color:var(--accent)}
+.path .choose{justify-self:start}
+.path.chosen .choose{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.save-bar{margin-top:22px;padding:18px 20px;border-radius:var(--r-lg);background:var(--soft);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.save-bar p{margin:0}
+
+/* project dialog */
+dialog{border:0;padding:0;border-radius:var(--r-lg);background:var(--surface);color:var(--ink);width:min(560px,calc(100% - 24px));max-height:calc(100% - 40px)}
+dialog::backdrop{background:rgba(10,15,13,.5)}
+.dlg{padding:24px}
+.dlg-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.dlg-head h2{font-family:var(--display);font-weight:800;margin:0;font-size:1.6rem}
+.x{border:0;background:var(--soft);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.1rem}
+.pstage{border-top:1.5px solid var(--line);padding:14px 0;display:grid;grid-template-columns:32px 1fr;gap:4px 12px}
+.pstage .n{font-family:var(--display);font-weight:800;font-size:1.2rem;color:var(--muted)}
+.pstage.done .n{color:var(--deep)}
+.pstage h3{margin:0;font-size:1rem}
+.pstage p{margin:2px 0 0;color:var(--muted);font-size:.9rem}
+.pstage .saved{color:var(--ink);background:var(--soft);border-radius:var(--r-sm);padding:10px 12px;margin-top:8px;font-size:.92rem}
+.storage-note{font-size:.82rem;color:var(--muted);margin-top:12px}
+.danger-link{background:none;border:0;color:var(--danger);cursor:pointer;padding:0;font-size:.88rem;text-decoration:underline}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:999px;font-weight:600;transition:.25s;pointer-events:none;z-index:10}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+footer{padding:40px 0 30px;color:var(--muted);font-size:.85rem}
+
+@media (max-width:640px){
+  .q{grid-template-columns:1fr;padding:18px}
+  .q .qn{display:flex;align-items:baseline;gap:8px;font-size:1.2rem}
+  .q .qn small{display:inline;margin:0}
+  .facts{grid-template-columns:1fr}
+  .row2{grid-template-columns:1fr}
+  .path{grid-template-columns:1fr;padding:20px 18px 16px}
+  .path .letter{font-size:1.8rem}
+  .btn{width:100%}
+  .path .choose{width:auto}
+}
+/* ===== v2: áreas interactivas ===== */
+.rail .stage{border:0;cursor:pointer;font:inherit}
+.rail .stage:disabled{cursor:not-allowed;opacity:.55}
+.rail .stage.visited:not(.current){background:var(--surface);border:1.5px solid var(--line)}
+.btn-project .pct{font-family:var(--display);font-weight:700;color:var(--deep)}
+.view{display:none}.view.on{display:block}
+
+.tools-wrap{margin:4px 0 22px}
+.tools-title{font-size:.85rem;color:var(--muted);font-weight:600;margin:0 0 8px}
+.tools{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tool{display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-md);padding:11px 12px;cursor:pointer;font-weight:600;font-size:.93rem;text-align:left;line-height:1.25}
+.tool:hover{border-color:var(--deep)}
+.tool .ic{font-size:1.15rem;flex:none}
+
+.area-head{padding:10px 0 18px}
+.area-head .kicker{display:inline-flex;align-items:center;gap:8px;font-family:var(--display);font-weight:700;color:var(--deep);font-size:1rem;margin-bottom:6px}
+.area-head .kicker b{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--deep);color:var(--deep-ink);font-size:.95rem}
+.area-head h2{font-family:var(--display);font-weight:800;font-size:clamp(1.8rem,5vw,2.6rem);letter-spacing:-.025em;line-height:1.03;margin:0 0 8px}
+.area-head p{margin:0;color:var(--muted);max-width:56ch}
+
+.card{background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:18px 20px;margin-bottom:12px}
+.card.pick{border:2px solid var(--accent)}
+.card h3{font-family:var(--display);font-weight:700;font-size:1.2rem;margin:0 0 6px;line-height:1.2}
+.card p{margin:0 0 10px}
+.card .small{font-size:.9rem;color:var(--muted)}
+.ctx-strip{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--soft);border-radius:var(--r-md);padding:10px 14px;margin-bottom:16px;font-size:.92rem}
+.ctx-strip b{font-weight:600}
+.linkbtn{background:none;border:0;padding:0;color:var(--deep);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn-sm{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;font-weight:600;font-size:.9rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn-sm:hover{border-color:var(--deep)}
+.btn-sm.on{background:var(--deep);color:var(--deep-ink);border-color:var(--deep)}
+.btn-sm.gold{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn-sm:disabled{opacity:.5;cursor:not-allowed}
+.busy::before{content:"";width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite;display:inline-block;margin-right:6px;vertical-align:-2px}
+.big-cta{width:100%;padding:20px;font-size:1.08rem}
+
+.meter{height:8px;background:var(--soft);border-radius:99px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--deep);border-radius:99px;transition:width .35s}
+.meter.gold i{background:var(--accent)}
+.meter-row{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--muted)}
+.meter-row .meter{flex:1}
+
+.model-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.fit{font-family:var(--display);font-weight:800;font-size:1.5rem;color:var(--deep);line-height:1;text-align:right}
+.fit small{display:block;font-family:var(--body);font-size:.72rem;font-weight:500;color:var(--muted)}
+
+.field{background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:16px 18px;margin-bottom:10px}
+.field.ok{border-color:var(--deep)}
+.field-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.field-head h3{margin:0;font-size:.9rem;color:var(--muted);font-weight:600}
+.okb{font-size:.8rem;font-weight:600;color:var(--deep)}
+.field .val{font-size:1.05rem;margin:0 0 12px;white-space:pre-wrap}
+.field .val.title{font-family:var(--display);font-weight:700;font-size:1.35rem;line-height:1.2}
+.field ul.val{padding-left:20px;white-space:normal}
+.offer-ready{background:var(--deep);color:var(--deep-ink);border-radius:var(--r-lg);padding:22px;margin:16px 0}
+.offer-ready h3{font-family:var(--display);font-weight:800;font-size:1.5rem;margin:0 0 6px}
+.offer-ready p{margin:0 0 8px}
+.offer-ready .btn-sm{background:transparent;color:var(--deep-ink);border-color:currentColor}
+
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:16px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.msgbox{background:var(--bg);border:1.5px solid var(--line);border-radius:var(--r-md);padding:12px 14px;white-space:pre-wrap;margin:8px 0 12px;font-size:.96rem}
+
+.checks{list-style:none;margin:0;padding:0}
+.checks li{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.checks li:last-child{border-bottom:0}
+.checks input{width:22px;height:22px;accent-color:var(--deep);flex:none;margin-top:1px;cursor:pointer}
+.checks label{flex:1;cursor:pointer}
+.checks li.done label{text-decoration:line-through;color:var(--muted)}
+.checks .mins{font-size:.8rem;color:var(--muted);white-space:nowrap}
+.checks .auto{font-size:.75rem;color:var(--deep);font-weight:600}
+
+.scen{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:18px}
+.scen button{background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-md);padding:14px;text-align:left;cursor:pointer;font-weight:600}
+.scen button:hover{border-color:var(--deep)}
+.scen button small{display:block;font-weight:400;color:var(--muted);font-size:.84rem;margin-top:2px}
+.chat{display:flex;flex-direction:column;gap:10px;background:var(--soft);border-radius:var(--r-lg);padding:16px;min-height:200px}
+.bubble{max-width:86%;padding:10px 14px;border-radius:18px;white-space:pre-wrap}
+.bubble.cli{background:var(--surface);align-self:flex-start;border-bottom-left-radius:5px}
+.bubble.yo{background:var(--deep);color:var(--deep-ink);align-self:flex-end;border-bottom-right-radius:5px}
+.bubble .who{display:block;font-size:.75rem;font-weight:600;opacity:.7;margin-bottom:2px}
+.composer{display:flex;gap:8px;margin-top:10px;align-items:flex-end}
+.composer textarea{min-height:54px;flex:1}
+.score{display:flex;align-items:center;gap:18px;margin-bottom:12px}
+.score .num{font-family:var(--display);font-weight:800;font-size:3.2rem;line-height:1;color:var(--deep)}
+.score .num small{font-size:1.1rem;color:var(--muted)}
+.alert{background:color-mix(in srgb,var(--danger) 12%,transparent);border-radius:var(--r-md);padding:10px 12px;color:var(--ink);margin-bottom:10px;font-size:.93rem}
+.hist{display:flex;gap:6px;align-items:flex-end;height:60px;margin-top:6px}
+.hist i{flex:1;max-width:26px;background:var(--deep);border-radius:6px 6px 2px 2px;opacity:.85}
+
+.counters{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.counter{background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-md);padding:14px 12px;text-align:center}
+.counter .lbl{font-size:.82rem;color:var(--muted);font-weight:600}
+.counter .num{font-family:var(--display);font-weight:800;font-size:2.1rem;line-height:1.1;margin:4px 0 8px}
+.counter .pm{display:flex;justify-content:center;gap:6px}
+.counter .pm button{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);background:var(--bg);cursor:pointer;font-size:1.1rem;font-weight:700}
+.counter.money .num{color:var(--deep)}
+.sale-row{display:flex;gap:8px;margin-top:6px}
+.sale-row input{padding:8px 10px;border-radius:10px;min-width:0}
+.funnel{display:grid;gap:8px;margin:6px 0 4px}
+.funnel .fr{display:grid;grid-template-columns:90px 1fr 48px;align-items:center;gap:10px;font-size:.88rem}
+.funnel .bar{height:22px;background:var(--soft);border-radius:6px;overflow:hidden}
+.funnel .bar i{display:block;height:100%;background:var(--deep);border-radius:6px;transition:width .35s}
+.funnel .fr:last-child .bar i{background:var(--accent)}
+.rates{display:flex;gap:16px;flex-wrap:wrap;font-size:.9rem;color:var(--muted);margin-top:8px}
+.rates b{color:var(--ink)}
+.addrow{display:flex;gap:8px;margin-top:10px}
+.gate{text-align:center;padding:34px 20px}
+.gate p{color:var(--muted);margin:0 0 16px}
+.sec-title{font-family:var(--display);font-weight:700;font-size:1.25rem;margin:26px 0 10px}
+.overall{margin:0 0 16px}
+.overall .big{font-family:var(--display);font-weight:800;font-size:2.4rem;line-height:1;color:var(--deep)}
+
+@media (max-width:640px){
+  .tools{grid-template-columns:repeat(2,1fr)}
+  .scen{grid-template-columns:1fr}
+  .counters{grid-template-columns:repeat(2,1fr)}
+  .area .btn{width:100%}
+  .funnel .fr{grid-template-columns:78px 1fr 40px}
+}
+/* ===== Shark de Ventas ===== */
+.shark-promo{display:flex;align-items:center;gap:14px;width:100%;margin-top:8px;padding:14px 16px;border-radius:var(--r-md);border:0;cursor:pointer;text-align:left;background:linear-gradient(120deg,#0E3B4A,#15616D);color:#fff}
+.shark-promo .fin{font-size:1.9rem;line-height:1}
+.shark-promo b{font-family:var(--display);font-size:1.05rem;display:block}
+.shark-promo small{opacity:.85}
+.shark-promo .go{margin-left:auto;background:rgba(255,255,255,.16);border-radius:999px;padding:6px 12px;font-weight:600;font-size:.88rem;white-space:nowrap}
+
+.ocean{--sea1:#0E3B4A;--sea2:#15616D;--foam:#BFE6E4;--sand:#F3C969;background:linear-gradient(180deg,var(--sea2),var(--sea1));color:#fff;border-radius:var(--r-lg);padding:22px 20px;margin-bottom:18px;position:relative;overflow:hidden}
+.ocean h2{font-family:var(--display);font-weight:800;font-size:clamp(1.7rem,5vw,2.4rem);letter-spacing:-.025em;line-height:1.03;margin:0 0 6px}
+.ocean p{margin:0;opacity:.85;max-width:52ch}
+.rank{display:flex;align-items:center;gap:14px;margin-top:18px;background:rgba(255,255,255,.1);border-radius:var(--r-md);padding:12px 14px}
+.rank .em{font-size:2.3rem;line-height:1}
+.rank .who{flex:1;min-width:0}
+.rank .who b{font-family:var(--display);font-size:1.15rem;display:block}
+.rank .who small{opacity:.8}
+.xpbar{height:10px;background:rgba(255,255,255,.18);border-radius:99px;overflow:hidden;margin-top:6px}
+.xpbar i{display:block;height:100%;background:var(--sand);border-radius:99px;transition:width .5s}
+.rank .xp{font-family:var(--display);font-weight:800;font-size:1.3rem;color:var(--sand);text-align:right;line-height:1}
+.rank .xp small{display:block;font-family:var(--body);font-weight:500;font-size:.7rem;color:#fff;opacity:.75}
+
+.map{position:relative;padding:6px 0 10px;display:grid;gap:4px}
+.map::before{content:"";position:absolute;left:50%;top:30px;bottom:30px;border-left:3px dashed var(--line);transform:translateX(-50%)}
+.node{position:relative;display:flex;align-items:center;gap:12px;width:min(340px,86%);background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:8px 18px 8px 8px;cursor:pointer;text-align:left}
+.node:nth-child(odd){justify-self:start}
+.node:nth-child(even){justify-self:end;flex-direction:row-reverse;padding:8px 8px 8px 18px;text-align:right}
+.node .orb{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-size:1.6rem;background:var(--soft);flex:none}
+.node .info{flex:1;min-width:0}
+.node .info b{display:block;font-family:var(--display);font-size:1.02rem;line-height:1.15}
+.node .info small{color:var(--muted);font-size:.82rem}
+.stars{color:var(--accent);letter-spacing:2px;font-size:.95rem}
+.stars .off{color:var(--line)}
+.node.passed{border-color:var(--deep)}
+.node.passed .orb{background:var(--deep)}
+.node.next{border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 25%,transparent)}
+.node.next .orb{background:var(--accent);animation:bob 2.4s ease-in-out infinite}
+.node.boss .orb{background:#0E3B4A;color:#fff}
+.node:disabled{cursor:not-allowed;opacity:.5}
+@keyframes bob{50%{transform:translateY(-3px)}}
+
+.lvl-top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.lvl-top .orb{width:48px;height:48px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-size:1.5rem;flex:none}
+.lvl-top h2{font-family:var(--display);font-weight:800;font-size:1.6rem;margin:0;line-height:1.05}
+.lvl-top small{color:var(--muted)}
+.steps{display:flex;gap:4px;margin-bottom:18px}
+.steps span{flex:1;text-align:center;font-size:.76rem;font-weight:600;color:var(--muted);padding-top:8px;border-top:4px solid var(--line)}
+.steps span.done{border-color:var(--deep);color:var(--deep)}
+.steps span.cur{border-color:var(--accent);color:var(--ink)}
+
+.tips{display:grid;gap:8px;margin-bottom:14px}
+.tip{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-md);padding:13px 14px;font-weight:500}
+.tip .k{font-family:var(--display);font-weight:800;color:var(--deep);font-size:1.2rem;line-height:1.1}
+.clave{font-family:var(--display);font-weight:800;font-size:clamp(1.35rem,4vw,1.8rem);line-height:1.12;letter-spacing:-.015em;padding:18px 20px;border-left:6px solid var(--accent);background:var(--soft);border-radius:0 var(--r-md) var(--r-md) 0;margin-bottom:16px}
+
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:var(--r-md);padding:13px 14px;cursor:pointer;font:inherit}
+.opt:hover:not(:disabled){border-color:var(--deep)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--deep);background:color-mix(in srgb,var(--deep) 10%,var(--surface))}
+.opt.wrong{border-color:var(--danger);background:color-mix(in srgb,var(--danger) 8%,var(--surface))}
+.opt .why{display:block;margin-top:6px;font-size:.88rem;color:var(--muted)}
+.opt .mark{font-weight:700;margin-right:6px}
+.sit{background:var(--soft);border-radius:var(--r-md);padding:12px 14px;font-size:.95rem;margin-bottom:12px}
+.sit b{display:block;font-size:.8rem;color:var(--muted);margin-bottom:2px}
+
+.ring{--p:0;width:120px;height:120px;border-radius:50%;display:grid;place-items:center;flex:none;background:conic-gradient(var(--deep) calc(var(--p)*1%),var(--soft) 0)}
+.ring span{width:92px;height:92px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:2rem}
+.fb-top{display:flex;align-items:center;gap:18px;margin-bottom:14px;flex-wrap:wrap}
+.crit{list-style:none;padding:0;margin:0 0 12px}
+.crit li{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--line)}
+.crit li:last-child{border:0}
+.crit .ic{font-weight:800;width:22px;text-align:center}
+.crit .y{color:var(--deep)} .crit .n{color:var(--danger)}
+.levelup{text-align:center;padding:30px 20px;border-radius:var(--r-lg);background:linear-gradient(180deg,#15616D,#0E3B4A);color:#fff}
+.levelup .big-stars{font-size:3rem;letter-spacing:6px;color:#F3C969;line-height:1;margin:8px 0}
+.levelup .big-stars .off{color:rgba(255,255,255,.2)}
+.levelup h3{font-family:var(--display);font-weight:800;font-size:2rem;margin:0 0 6px}
+.levelup p{margin:0 0 6px;opacity:.9}
+.levelup .gain{display:inline-block;background:rgba(255,255,255,.14);border-radius:999px;padding:5px 14px;font-weight:700;margin:6px 0 14px}
+.levelup .btn-sm{background:#fff;color:#0E3B4A;border-color:#fff}
+.levelup .btn-sm.ghost{background:transparent;color:#fff}
+.pop{animation:pop .6s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{0%{transform:scale(.4);opacity:0}100%{transform:scale(1);opacity:1}}
+@media (max-width:640px){
+  .map::before{left:34px}
+  .node,.node:nth-child(even){justify-self:stretch;width:100%;flex-direction:row;padding:8px 18px 8px 8px;text-align:left}
+}
+/* ===== Mi Ruta de Ingresos ===== */
+.ruta-promo{background:linear-gradient(120deg,#5B4A12,#9A7A1C)}
+.money-hero{background:linear-gradient(160deg,#2B2A12,#4A3F10);color:#FFF6DA;border-radius:var(--r-lg);padding:22px 20px;margin-bottom:16px}
+.money-hero h2{font-family:var(--display);font-weight:800;font-size:clamp(1.7rem,5vw,2.4rem);letter-spacing:-.025em;line-height:1.03;margin:0 0 6px}
+.money-hero p{margin:0;opacity:.85}
+.track{display:flex;gap:8px;overflow-x:auto;padding:14px 2px 6px;margin-top:14px;scrollbar-width:thin}
+.mile{flex:0 0 auto;min-width:92px;border:2px solid rgba(255,246,218,.25);background:rgba(255,246,218,.06);color:inherit;border-radius:var(--r-md);padding:10px 12px;cursor:pointer;text-align:left;font:inherit;position:relative}
+.mile b{display:block;font-family:var(--display);font-weight:800;font-size:1.25rem;line-height:1.1}
+.mile small{font-size:.75rem;opacity:.8;white-space:nowrap}
+.mile.done{background:#F3C969;color:#2B2A12;border-color:#F3C969}
+.mile.cur{border-color:#F3C969;box-shadow:0 0 0 3px rgba(243,201,105,.35)}
+.mile.sel{outline:3px solid #fff;outline-offset:2px}
+.mile.lock{opacity:.5}
+.mile .st{position:absolute;top:6px;right:8px;font-size:.8rem}
+
+.goal{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.goal .amt{font-family:var(--display);font-weight:800;font-size:clamp(2.4rem,8vw,3.6rem);line-height:.95;letter-spacing:-.03em;color:var(--deep)}
+.goal .amt small{font-size:1rem;color:var(--muted);font-weight:600;letter-spacing:0}
+.phase{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:4px 12px;font-weight:700;font-size:.88rem}
+.evol{font-size:.93rem;margin:10px 0 0;padding:10px 12px;background:var(--soft);border-radius:var(--r-md)}
+
+.calc{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.calc .c{background:var(--bg);border-radius:var(--r-md);padding:12px;text-align:center}
+.calc .c b{display:block;font-family:var(--display);font-weight:800;font-size:1.6rem;line-height:1.1}
+.calc .c span{font-size:.78rem;color:var(--muted);font-weight:600}
+.calc-in{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:.9rem}
+.calc-in input{width:120px;padding:8px 10px}
+.calc-in .chips .chip{padding:6px 12px;font-size:.85rem}
+
+details.sec{background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-lg);margin-bottom:10px;overflow:hidden}
+details.sec>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:15px 18px;font-weight:600}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary .ic{font-size:1.25rem}
+details.sec>summary .cnt{margin-left:auto;font-size:.8rem;color:var(--muted);font-weight:500}
+details.sec>summary::after{content:"▾";color:var(--muted);transition:transform .2s}
+details.sec[open]>summary::after{transform:rotate(180deg)}
+details.sec .in{padding:0 18px 16px}
+.item{padding:12px 0;border-top:1px solid var(--line)}
+.item:first-child{border-top:0;padding-top:2px}
+.item b{display:block}
+.item p{margin:4px 0 8px;font-size:.94rem}
+.grow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.grow>div{background:var(--bg);border-radius:var(--r-md);padding:12px}
+.grow h4{margin:0 0 6px;font-size:.88rem;color:var(--deep)}
+.grow ul{margin:0;padding-left:18px;font-size:.92rem}
+.steps-list{counter-reset:s;list-style:none;padding:0;margin:0}
+.steps-list li{counter-increment:s;display:flex;gap:12px;padding:8px 0}
+.steps-list li::before{content:counter(s);font-family:var(--display);font-weight:800;color:var(--deep);width:22px;flex:none}
+.cadence{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px}
+.cadence .cd{flex:0 0 160px;background:var(--bg);border-radius:var(--r-md);padding:10px 12px;font-size:.88rem}
+.cadence .cd b{display:block;color:var(--deep);font-size:.8rem}
+
+.crm{display:grid;gap:8px}
+.pros{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;background:var(--bg);border-radius:var(--r-md);padding:10px 12px}
+.pros .nm{font-weight:600}
+.pros .nt{grid-column:1/-1;font-size:.86rem;color:var(--muted)}
+.pros select{width:auto;padding:6px 10px;font-size:.85rem}
+.pros .acts{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
+.pipe{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.pipe span{background:var(--soft);border-radius:999px;padding:3px 10px;font-size:.8rem}
+.pipe b{font-weight:700}
+.gen-wait{display:flex;gap:14px;align-items:center;padding:22px;background:var(--soft);border-radius:var(--r-lg)}
+@media (max-width:640px){
+  .calc{grid-template-columns:repeat(2,1fr)}
+  .grow{grid-template-columns:1fr}
+}
+/* ===== Portada: tiburón premium ===== */
+.sea{position:relative;border-radius:var(--r-lg);overflow:hidden;margin:6px 0 4px;line-height:0;background:#03131B;box-shadow:inset 0 0 0 1px rgba(191,243,255,.08)}
+.sea svg{width:100%;height:auto;display:block}
+.sea2 .shark2{transform:translate(260px,118px);animation:swim2 11.0s linear infinite}
+@keyframes swim2{from{transform:translate(-280px,118px)}to{transform:translate(1080px,118px)}}
+.sea2 .sway{animation:sway2 2.2s ease-in-out infinite}
+@keyframes sway2{0%,100%{transform:translateY(0) rotate(-1.2deg)}50%{transform:translateY(-5px) rotate(1.2deg)}}
+.sea2 .tail2{transform-box:view-box;transform-origin:34px 2px;animation:wag2 .55s ease-in-out infinite alternate}
+@keyframes wag2{from{transform:rotate(-14deg) scaleX(.96)}to{transform:rotate(12deg) scaleX(1.02)}}
+.sea2 .wake{animation:wake .55s ease-in-out infinite alternate}
+@keyframes wake{to{opacity:.12;transform:translateX(-8px)}}
+.sea2 .farShark{transform:translate(900px,70px);animation:far 33.0s linear infinite}
+@keyframes far{from{transform:translate(900px,70px)}to{transform:translate(-120px,58px)}}
+.sea2 .bl{transform-box:fill-box;transform-origin:center}
+.sea2 .tumble{transform-box:fill-box;transform-origin:center;animation:tumble 2.8s ease-in-out infinite}
+.sea2 .tb{animation-duration:3.4s;animation-delay:-1.2s}.sea2 .tc{animation-duration:3.1s;animation-delay:-.6s}.sea2 .td{animation-duration:3.7s;animation-delay:-2s}
+@keyframes tumble{0%,100%{transform:translateY(0) rotate(0) scaleX(1)}50%{transform:translateY(6px) rotate(10deg) scaleX(.45)}}
+.sea2 .fl{opacity:0;transform-box:fill-box;transform-origin:center}
+.sea2 .gn{opacity:0;fill:#F3C969;font:600 11px var(--body);letter-spacing:.04em;filter:drop-shadow(0 0 4px rgba(243,201,105,.6))}
+.sea2 .pl{animation:drift2 60s linear infinite}
+.sea2 .pl-mid{animation-duration:38s}.sea2 .pl-near{animation-duration:20s}
+@keyframes drift2{to{transform:translate(-800px,-10px)}}
+.sea2 .causA{animation:causA 14s ease-in-out infinite alternate}
+.sea2 .causB{animation:causB 18s ease-in-out infinite alternate}
+@keyframes causA{to{transform:translate(-160px,4px)}}
+@keyframes causB{from{transform:translate(-200px,0)}to{transform:translate(20px,-3px)}}
+.sea2 .beams polygon{transform-box:fill-box;transform-origin:top center;animation:beam 7s ease-in-out infinite alternate}
+.sea2 .bm2{animation-delay:-2s!important;animation-duration:9s!important}.sea2 .bm3{animation-delay:-4s!important}
+@keyframes beam{0%{opacity:.55;transform:skewX(-4deg)}100%{opacity:1;transform:skewX(4deg)}}
+.sea2 .rf1{animation:rf 6s linear infinite}.sea2 .rf2{animation:rf 9s linear infinite reverse}
+@keyframes rf{to{transform:translateX(-320px)}}
+.sea2 .trend{stroke-dasharray:1200;stroke-dashoffset:1200;animation:trend 11.0s ease-out infinite}
+@keyframes trend{0%{stroke-dashoffset:1200}60%,100%{stroke-dashoffset:0}}
+.sea2 .jaw2{transform-box:view-box;transform-origin:196px 10px}
+@media (prefers-reduced-motion:reduce){.sea2 .bl{opacity:1}.sea2 .trend{stroke-dashoffset:0}}
+@keyframes chase0{0%{opacity:0;transform:translate(0,-18px)}1.0%{opacity:1;transform:translate(0,0)}12.4%{opacity:1;transform:translate(0,0)}21.0%{opacity:1;transform:translate(22px,-3px) scale(1)}23.0%{opacity:0;transform:translate(30px,-2px) scale(.15)}100%{opacity:0;transform:translate(30px,-2px) scale(.15)}}
+.sea2 .bl0{animation:chase0 11.0s linear infinite}
+@keyframes flash0{0%,20.9%{opacity:0;transform:scale(.3)}22.4%{opacity:.9;transform:scale(1)}29.4%,100%{opacity:0;transform:scale(2.2)}}
+.sea2 .fl0{animation:flash0 11.0s linear infinite}
+@keyframes gain0{0%,21.4%{opacity:0;transform:translateY(4px)}23.4%{opacity:1;transform:translateY(0)}33.4%,100%{opacity:0;transform:translateY(-26px)}}
+.sea2 .gn0{animation:gain0 11.0s linear infinite}
+@keyframes chase1{0%{opacity:0;transform:translate(0,-18px)}5.4%{opacity:1;transform:translate(0,0)}26.4%{opacity:1;transform:translate(0,0)}35.0%{opacity:1;transform:translate(22px,-3px) scale(1)}37.0%{opacity:0;transform:translate(30px,-2px) scale(.15)}100%{opacity:0;transform:translate(30px,-2px) scale(.15)}}
+.sea2 .bl1{animation:chase1 11.0s linear infinite}
+@keyframes flash1{0%,34.9%{opacity:0;transform:scale(.3)}36.4%{opacity:.9;transform:scale(1)}43.4%,100%{opacity:0;transform:scale(2.2)}}
+.sea2 .fl1{animation:flash1 11.0s linear infinite}
+@keyframes gain1{0%,35.4%{opacity:0;transform:translateY(4px)}37.4%{opacity:1;transform:translateY(0)}47.4%,100%{opacity:0;transform:translateY(-26px)}}
+.sea2 .gn1{animation:gain1 11.0s linear infinite}
+@keyframes chase2{0%{opacity:0;transform:translate(0,-18px)}19.0%{opacity:1;transform:translate(0,0)}40.0%{opacity:1;transform:translate(0,0)}48.6%{opacity:1;transform:translate(22px,-3px) scale(1)}50.6%{opacity:0;transform:translate(30px,-2px) scale(.15)}100%{opacity:0;transform:translate(30px,-2px) scale(.15)}}
+.sea2 .bl2{animation:chase2 11.0s linear infinite}
+@keyframes flash2{0%,48.5%{opacity:0;transform:scale(.3)}50.0%{opacity:.9;transform:scale(1)}57.0%,100%{opacity:0;transform:scale(2.2)}}
+.sea2 .fl2{animation:flash2 11.0s linear infinite}
+@keyframes gain2{0%,49.0%{opacity:0;transform:translateY(4px)}51.0%{opacity:1;transform:translateY(0)}61.0%,100%{opacity:0;transform:translateY(-26px)}}
+.sea2 .gn2{animation:gain2 11.0s linear infinite}
+@keyframes chase3{0%{opacity:0;transform:translate(0,-18px)}32.2%{opacity:1;transform:translate(0,0)}53.2%{opacity:1;transform:translate(0,0)}61.8%{opacity:1;transform:translate(22px,-3px) scale(1)}63.8%{opacity:0;transform:translate(30px,-2px) scale(.15)}100%{opacity:0;transform:translate(30px,-2px) scale(.15)}}
+.sea2 .bl3{animation:chase3 11.0s linear infinite}
+@keyframes flash3{0%,61.7%{opacity:0;transform:scale(.3)}63.2%{opacity:.9;transform:scale(1)}70.2%,100%{opacity:0;transform:scale(2.2)}}
+.sea2 .fl3{animation:flash3 11.0s linear infinite}
+@keyframes gain3{0%,62.2%{opacity:0;transform:translateY(4px)}64.2%{opacity:1;transform:translateY(0)}74.2%,100%{opacity:0;transform:translateY(-26px)}}
+.sea2 .gn3{animation:gain3 11.0s linear infinite}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">De Idea <span>a Oferta</span></div>
+    <div class="btnrow">
+      <button class="btn-project" id="installBtn" type="button" hidden>📲 Instalar app</button>
+      <button class="btn-project" id="openProject" type="button"><span class="dot"></span>Mi Proyecto <span class="pct" id="pct">0%</span></button>
+    </div>
+  </header>
+
+  <nav class="rail" id="rail" aria-label="Áreas"></nav>
+
+  <div class="tools-wrap" id="toolsWrap" hidden>
+    <p class="tools-title">Herramientas rápidas</p>
+    <div class="tools">
+      <button class="tool" type="button" data-tool="monetizar"><span class="ic" aria-hidden="true">💰</span>Monetizar mi idea</button>
+      <button class="tool" type="button" data-tool="clientes"><span class="ic" aria-hidden="true">🎯</span>Buscar clientes</button>
+      <button class="tool" type="button" data-tool="oferta"><span class="ic" aria-hidden="true">🧩</span>Crear mi oferta</button>
+      <button class="tool" type="button" data-tool="practicar"><span class="ic" aria-hidden="true">🎙️</span>Practicar una venta</button>
+      <button class="tool" type="button" data-tool="contenido"><span class="ic" aria-hidden="true">📣</span>Crear contenido para vender</button>
+      <button class="tool" type="button" data-tool="progreso"><span class="ic" aria-hidden="true">📈</span>Ver mi progreso</button>
+    </div>
+    <div id="sharkPromo"></div>
+  </div>
+
+  <!-- ===== VISTA: DIAGNÓSTICO (sin cambios en su funcionamiento) ===== -->
+  <div class="view on" id="v-diagnostico">
+  <div class="sea sea2" role="img" aria-label="Un tiburón nada en aguas profundas persiguiendo billetes">
+    <svg viewBox="0 0 800 220" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <radialGradient id="abyss" cx=".5" cy="-.1" r="1.1"><stop offset="0" stop-color="#1B6D80"/><stop offset=".35" stop-color="#0D4152"/><stop offset=".75" stop-color="#062431"/><stop offset="1" stop-color="#03131B"/></radialGradient>
+        <linearGradient id="surf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9FE3F0" stop-opacity=".55"/><stop offset=".5" stop-color="#5FB8CB" stop-opacity=".12"/><stop offset="1" stop-color="#5FB8CB" stop-opacity="0"/></linearGradient>
+        <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CFF6FF" stop-opacity=".42"/><stop offset=".6" stop-color="#CFF6FF" stop-opacity=".06"/><stop offset="1" stop-color="#CFF6FF" stop-opacity="0"/></linearGradient>
+        <linearGradient id="causFade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#fff" stop-opacity=".25"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <mask id="causMask"><rect width="800" height="220" fill="url(#causFade)"/></mask>
+        <radialGradient id="vig" cx=".5" cy=".45" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>
+        <linearGradient id="dorsum" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16242D"/><stop offset=".45" stop-color="#3C5564"/><stop offset=".78" stop-color="#7896A5"/><stop offset="1" stop-color="#A9BEC8"/></linearGradient>
+        <linearGradient id="belly" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4F8F9"/><stop offset="1" stop-color="#B9C8CF"/></linearGradient>
+        <linearGradient id="finG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2B4250"/><stop offset="1" stop-color="#15222A"/></linearGradient>
+        <linearGradient id="spec" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#E9FBFF" stop-opacity="0"/><stop offset=".55" stop-color="#E9FBFF" stop-opacity=".55"/><stop offset="1" stop-color="#E9FBFF" stop-opacity="0"/></linearGradient>
+        <radialGradient id="rim" cx=".75" cy=".1" r=".7"><stop offset="0" stop-color="#BFF3FF" stop-opacity=".35"/><stop offset="1" stop-color="#BFF3FF" stop-opacity="0"/></radialGradient>
+        <radialGradient id="flashG"><stop offset="0" stop-color="#FFE7A3" stop-opacity=".95"/><stop offset=".45" stop-color="#F3C969" stop-opacity=".45"/><stop offset="1" stop-color="#F3C969" stop-opacity="0"/></radialGradient>
+        <linearGradient id="noteG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C9D8C4"/><stop offset=".5" stop-color="#9DB59A"/><stop offset="1" stop-color="#6E8C72"/></linearGradient>
+        <linearGradient id="noteSheen" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.4"/></filter>
+        <filter id="haze" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3.2"/></filter>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <g id="nota">
+          <rect x="-30" y="-14" width="60" height="28" rx="2.5" fill="url(#noteG)"/>
+          <rect x="-27" y="-11" width="54" height="22" rx="1.5" fill="none" stroke="#4E6B53" stroke-width=".7" opacity=".8"/>
+          <ellipse cx="0" cy="0" rx="8" ry="9" fill="#B7CBB2" stroke="#4E6B53" stroke-width=".7"/>
+          <path d="M-4 5 C-4 -1 4 -1 4 5 M0 -5 a3 3 0 1 0 .1 0" fill="none" stroke="#4E6B53" stroke-width=".8"/>
+          <path d="M-24 -6 H-12 M-24 -3 H-14 M-24 0 H-12 M12 6 H24 M14 3 H24 M12 0 H24" stroke="#4E6B53" stroke-width=".5" opacity=".7"/>
+          <text x="-20" y="10" font-size="6" font-weight="700" fill="#3E5A44" font-family="Arial, sans-serif">100</text>
+          <text x="20" y="-5" font-size="6" font-weight="700" fill="#3E5A44" text-anchor="middle" font-family="Arial, sans-serif">100</text>
+          <rect x="-30" y="-14" width="60" height="28" rx="2.5" fill="url(#noteSheen)" class="sheen"/>
+        </g>
+        <path id="silueta" d="M30 0 C60 -10 95 -30 140 -34 C180 -37 212 -26 232 -8 C236 -4 236 2 230 6 C218 14 200 20 176 22 C140 26 90 22 60 12 C45 8 36 5 30 2 Z M150 -35 C145 -55 132 -72 120 -80 C124 -62 122 -45 116 -32 Z M160 16 C148 30 128 46 108 56 C118 42 130 28 138 18 Z M34 1 C20 -10 6 -30 -8 -52 C-4 -30 -6 -12 -2 0 C-6 10 -8 20 -14 34 C0 24 16 12 34 4 Z"/>
+      </defs>
+
+      <rect width="800" height="220" fill="url(#abyss)"/>
+
+      <!-- fondo de datos: tendencia al alza -->
+      <g class="data" opacity=".16">
+        <path d="M0 60 H800 M0 110 H800 M0 160 H800" stroke="#9FE3F0" stroke-width=".5" opacity=".5"/>
+        <polyline class="trend" points="-10,200 90,184 170,190 250,160 330,168 410,136 490,142 570,108 650,114 730,78 810,62" fill="none" stroke="#F3C969" stroke-width="2" filter="url(#glow)"/>
+      </g>
+
+      <g class="beams" filter="url(#haze)">
+        <polygon class="bm1" points="150,-10 205,-10 330,230 170,230" fill="url(#beam)"/>
+        <polygon class="bm2" points="440,-10 480,-10 600,230 490,230" fill="url(#beam)"/>
+        <polygon class="bm3" points="660,-10 690,-10 790,230 700,230" fill="url(#beam)"/>
+      </g>
+
+      <g mask="url(#causMask)" fill="none" stroke="#BFF3FF" stroke-width="1.1" filter="url(#soft)">
+        <g class="causA" opacity=".22"><path d="M-300,18.0 L-280,20.7 L-260,22.4 L-240,22.5 L-220,21.0 L-200,18.4 L-180,15.6 L-160,13.7 L-140,13.4 L-120,14.7 L-100,17.2 L-80,20.0 L-60,22.1 L-40,22.7 L-20,21.5 L0,19.1 L20,16.3 L40,14.1 L60,13.3 L80,14.2 L100,16.5 L120,19.3 L140,21.7 L160,22.7 L180,22.0 L200,19.9 L220,17.1 L240,14.6 L260,13.4 L280,13.8 L300,15.8 L320,18.6 L340,21.2 L360,22.6 L380,22.4 L400,20.6 L420,17.9 L440,15.2 L460,13.6 L480,13.6 L500,15.2 L520,17.8 L540,20.6 L560,22.4 L580,22.6 L600,21.2 L620,18.6 L640,15.9 L660,13.9 L680,13.4 L700,14.6 L720,17.1 L740,19.9 L760,22.1 L780,22.8 L800,21.8 L820,19.4 L840,16.6 L860,14.3 L880,13.4 L900,14.2 L920,16.4 L940,19.2 L960,21.6 L980,22.8 L1000,22.2 L1020,20.2 L1040,17.4 L1060,14.8 L1080,13.5 L1100,13.8 L1120,15.7 L1140,18.5 L1160,21.1 L1180,22.6 L1200,22.5 L1220,20.8 L1240,18.1 L1260,15.5 L1280,13.7 L1300,13.6 L1320,15.1 L1340,17.7 L1360,20.5 L1380,22.4 L1400,22.7"/><path d="M-300,37.7 L-280,40.6 L-260,41.6 L-240,39.8 L-220,35.9 L-200,31.7 L-180,29.1 L-160,29.4 L-140,31.9 L-120,35.1 L-100,36.8 L-80,35.8 L-60,32.4 L-40,28.0 L-20,24.8 L0,24.2 L20,26.3 L40,29.5 L60,31.8 L80,31.6 L100,28.8 L120,24.4 L140,20.7 L160,19.3 L180,20.7 L200,23.8 L220,26.6 L240,27.2 L260,25.0 L280,20.9 L300,16.8 L320,14.6 L340,15.3 L360,18.0 L380,21.1 L400,22.5 L420,21.1 L440,17.4 L460,13.1 L480,10.2 L500,10.0 L520,12.3 L540,15.5 L560,17.6 L580,17.0 L600,13.8 L620,9.5 L640,6.0 L660,5.0 L680,6.7 L700,9.9 L720,12.4 L740,12.7 L760,10.2 L780,5.9 L800,2.0 L820,0.2 L840,1.2 L860,4.1 L880,7.1 L900,8.1 L920,6.4 L940,2.4 L960,-1.8 L980,-4.4 L1000,-4.1 L1020,-1.6 L1040,1.6 L1060,3.3 L1080,2.4 L1100,-1.1 L1120,-5.5 L1140,-8.7 L1160,-9.3 L1180,-7.2 L1200,-4.0 L1220,-1.7 L1240,-1.9 L1260,-4.7 L1280,-9.0 L1300,-12.8 L1320,-14.2 L1340,-12.8 L1360,-9.7 L1380,-7.0 L1400,-6.3"/><path d="M-300,48.9 L-280,52.2 L-260,52.2 L-240,48.4 L-220,43.6 L-200,41.2 L-180,42.9 L-160,46.6 L-140,48.8 L-120,47.1 L-100,42.4 L-80,38.2 L-60,37.5 L-40,40.5 L-20,44.0 L0,44.7 L20,41.3 L40,36.4 L60,33.5 L80,34.6 L100,38.3 L120,40.9 L140,39.8 L160,35.3 L180,30.8 L200,29.5 L220,32.1 L240,35.8 L260,37.0 L280,34.2 L300,29.2 L320,25.8 L340,26.3 L360,29.8 L380,32.9 L400,32.4 L420,28.2 L440,23.5 L460,21.6 L480,23.7 L500,27.5 L520,29.3 L540,27.0 L560,22.2 L580,18.3 L600,18.2 L620,21.4 L640,24.8 L660,24.9 L680,21.2 L700,16.3 L720,13.8 L740,15.4 L760,19.1 L780,21.4 L800,19.8 L820,15.1 L840,10.8 L860,10.1 L880,13.0 L900,16.6 L920,17.3 L940,14.1 L960,9.1 L980,6.1 L1000,7.1 L1020,10.8 L1040,13.5 L1060,12.4 L1080,8.0 L1100,3.5 L1120,2.1 L1140,4.6 L1160,8.3 L1180,9.6 L1200,6.9 L1220,2.0 L1240,-1.5 L1260,-1.1 L1280,2.3 L1300,5.4 L1320,5.0 L1340,1.0 L1360,-3.8 L1380,-5.8 L1400,-3.8"/><path d="M-300,51.5 L-280,56.5 L-260,57.2 L-240,52.9 L-220,47.3 L-200,45.2 L-180,48.3 L-160,54.0 L-140,57.4 L-120,55.4 L-100,49.9 L-80,45.4 L-60,45.9 L-40,50.8 L-20,56.0 L0,56.9 L20,52.8 L40,47.1 L60,44.7 L80,47.7 L100,53.4 L120,56.9 L140,55.2 L160,49.7 L180,45.1 L200,45.3 L220,50.1 L240,55.4 L260,56.6 L280,52.6 L300,46.9 L320,44.3 L340,47.0 L360,52.7 L380,56.4 L400,55.0 L420,49.5 L440,44.8 L460,44.8 L480,49.5 L500,54.8 L520,56.2 L540,52.4 L560,46.7 L580,43.9 L600,46.4 L620,52.1 L640,56.0 L660,54.7 L680,49.4 L700,44.5 L720,44.3 L740,48.8 L760,54.2 L780,55.8 L800,52.2 L820,46.5 L840,43.5 L860,45.8 L880,51.4 L900,55.5 L920,54.5 L940,49.2 L960,44.2 L980,43.7 L1000,48.2 L1020,53.6 L1040,55.5 L1060,52.0 L1080,46.3 L1100,43.1 L1120,45.2 L1140,50.8 L1160,55.0 L1180,54.2 L1200,49.1 L1220,43.9 L1240,43.2 L1260,47.5 L1280,53.0 L1300,55.1 L1320,51.8 L1340,46.1 L1360,42.7 L1380,44.6 L1400,50.1"/><path d="M-300,65.1 L-280,68.9 L-260,70.6 L-240,69.2 L-220,65.3 L-200,60.9 L-180,58.2 L-160,58.5 L-140,61.5 L-120,65.6 L-100,68.4 L-80,68.4 L-60,65.5 L-40,61.0 L-20,57.3 L0,56.2 L20,58.1 L40,62.0 L60,65.7 L80,67.1 L100,65.4 L120,61.3 L140,57.0 L160,54.5 L180,55.1 L200,58.4 L220,62.4 L240,65.0 L260,64.7 L280,61.6 L300,57.1 L320,53.5 L340,52.7 L360,54.9 L380,58.9 L400,62.4 L420,63.5 L440,61.5 L460,57.3 L480,53.1 L500,50.9 L520,51.8 L540,55.2 L560,59.2 L580,61.6 L600,61.0 L620,57.6 L640,53.1 L660,49.8 L680,49.3 L700,51.7 L720,55.7 L740,59.1 L760,59.9 L780,57.6 L800,53.4 L820,49.2 L840,47.3 L860,48.5 L880,52.1 L900,56.0 L920,58.2 L940,57.3 L960,53.7 L980,49.2 L1000,46.1 L1020,45.8 L1040,48.5 L1060,52.6 L1080,55.8 L1100,56.3 L1120,53.8 L1140,49.4 L1160,45.4 L1180,43.8 L1200,45.3 L1220,49.0 L1240,52.8 L1260,54.7 L1280,53.5 L1300,49.7 L1320,45.3 L1340,42.4 L1360,42.5 L1380,45.4 L1400,49.4"/><path d="M-300,67.9 L-280,71.7 L-260,73.6 L-240,72.9 L-220,70.1 L-200,66.8 L-180,65.0 L-160,65.8 L-140,69.0 L-120,73.0 L-100,75.9 L-80,76.4 L-60,74.4 L-40,71.1 L-20,68.4 L0,68.0 L20,70.2 L40,74.1 L60,77.7 L80,79.4 L100,78.5 L120,75.5 L140,72.3 L160,70.7 L180,71.8 L200,75.1 L220,79.1 L240,81.9 L260,82.1 L280,79.8 L300,76.5 L320,74.0 L340,73.9 L360,76.3 L380,80.3 L400,83.8 L420,85.2 L440,84.0 L460,80.9 L480,77.8 L500,76.5 L520,77.8 L540,81.3 L560,85.3 L580,87.8 L600,87.7 L620,85.3 L640,81.9 L660,79.6 L680,79.8 L700,82.5 L720,86.5 L740,89.8 L760,91.0 L780,89.5 L800,86.3 L820,83.3 L840,82.3 L860,83.9 L880,87.5 L900,91.4 L920,93.7 L940,93.3 L960,90.7 L980,87.4 L1000,85.3 L1020,85.7 L1040,88.6 L1060,92.7 L1080,95.8 L1100,96.7 L1120,94.9 L1140,91.7 L1160,88.8 L1180,88.1 L1200,90.0 L1220,93.7 L1240,97.5 L1260,99.5 L1280,98.9 L1300,96.1 L1320,92.8 L1340,91.0 L1360,91.7 L1380,94.8 L1400,98.8"/><path d="M-300,88.5 L-280,90.5 L-260,91.3 L-240,90.3 L-220,87.9 L-200,85.2 L-180,83.4 L-160,83.4 L-140,84.9 L-120,87.1 L-100,88.6 L-80,88.5 L-60,86.6 L-40,83.9 L-20,81.5 L0,80.6 L20,81.5 L40,83.5 L60,85.5 L80,86.2 L100,85.1 L120,82.6 L140,79.9 L160,78.2 L180,78.3 L200,79.9 L220,82.1 L240,83.5 L260,83.3 L280,81.4 L300,78.6 L320,76.3 L340,75.5 L360,76.5 L380,78.6 L400,80.5 L420,81.1 L440,79.9 L460,77.4 L480,74.7 L500,73.1 L520,73.3 L540,75.0 L560,77.1 L580,78.5 L600,78.1 L620,76.1 L640,73.3 L660,71.1 L680,70.4 L700,71.5 L720,73.6 L740,75.5 L760,76.0 L780,74.7 L800,72.1 L820,69.4 L840,67.9 L860,68.2 L880,70.0 L900,72.1 L920,73.4 L940,72.9 L960,70.8 L980,68.1 L1000,65.9 L1020,65.3 L1040,66.5 L1060,68.6 L1080,70.4 L1100,70.8 L1120,69.4 L1140,66.8 L1160,64.2 L1180,62.8 L1200,63.2 L1220,65.0 L1240,67.1 L1260,68.3 L1280,67.7 L1300,65.6 L1320,62.8 L1340,60.7 L1360,60.2 L1380,61.4 L1400,63.6"/><path d="M-300,94.9 L-280,97.4 L-260,98.9 L-240,98.7 L-220,96.9 L-200,94.3 L-180,91.9 L-160,90.8 L-140,91.5 L-120,93.5 L-100,96.2 L-80,98.3 L-60,99.1 L-40,98.1 L-20,95.8 L0,93.2 L20,91.3 L40,91.0 L60,92.4 L80,94.8 L100,97.4 L120,99.0 L140,98.9 L160,97.2 L180,94.7 L200,92.3 L220,91.0 L240,91.5 L260,93.5 L280,96.2 L300,98.4 L320,99.3 L340,98.4 L360,96.2 L380,93.5 L400,91.6 L420,91.1 L440,92.4 L460,94.8 L480,97.4 L500,99.1 L520,99.2 L540,97.6 L560,95.0 L580,92.6 L600,91.2 L620,91.6 L640,93.5 L660,96.2 L680,98.4 L700,99.4 L720,98.7 L740,96.5 L760,93.9 L780,91.9 L800,91.3 L820,92.4 L840,94.8 L860,97.4 L880,99.2 L900,99.4 L920,97.9 L940,95.4 L960,92.9 L980,91.5 L1000,91.7 L1020,93.5 L1040,96.1 L1060,98.5 L1080,99.6 L1100,99.0 L1120,96.9 L1140,94.3 L1160,92.1 L1180,91.4 L1200,92.5 L1220,94.8 L1240,97.4 L1260,99.3 L1280,99.6 L1300,98.2 L1320,95.8 L1340,93.2 L1360,91.7 L1380,91.8 L1400,93.5"/><path d="M-300,98.6 L-280,102.3 L-260,104.7 L-240,104.9 L-220,103.0 L-200,100.1 L-180,97.6 L-160,96.8 L-140,98.2 L-120,101.4 L-100,105.3 L-80,108.5 L-60,109.7 L-40,108.8 L-20,106.2 L0,103.4 L20,101.6 L40,101.9 L60,104.4 L80,108.2 L100,111.8 L120,114.1 L140,114.2 L160,112.3 L180,109.4 L200,106.9 L220,106.2 L240,107.7 L260,111.0 L280,114.9 L300,118.0 L320,119.1 L340,118.1 L360,115.5 L380,112.6 L400,111.0 L420,111.4 L440,113.9 L460,117.7 L480,121.4 L500,123.5 L520,123.5 L540,121.5 L560,118.6 L580,116.2 L600,115.6 L620,117.2 L640,120.5 L660,124.4 L680,127.5 L700,128.5 L720,127.3 L740,124.7 L760,121.9 L780,120.3 L800,120.9 L820,123.5 L840,127.3 L860,130.9 L880,133.0 L900,132.8 L920,130.8 L940,127.8 L960,125.5 L980,125.0 L1000,126.7 L1020,130.1 L1040,134.0 L1060,136.9 L1080,137.9 L1100,136.6 L1120,133.9 L1140,131.2 L1160,129.7 L1180,130.3 L1200,133.0 L1220,136.9 L1240,140.4 L1260,142.4 L1280,142.1 L1300,140.0 L1320,137.1 L1340,134.8 L1360,134.4 L1380,136.2 L1400,139.7"/><path d="M-300,116.9 L-280,120.1 L-260,121.6 L-240,120.9 L-220,118.2 L-200,114.8 L-180,112.5 L-160,112.4 L-140,114.5 L-120,117.9 L-100,120.7 L-80,121.7 L-60,120.4 L-40,117.3 L-20,114.1 L0,112.3 L20,112.9 L40,115.4 L60,118.8 L80,121.3 L100,121.7 L120,119.7 L140,116.5 L160,113.5 L180,112.3 L200,113.4 L220,116.4 L240,119.7 L260,121.7 L280,121.4 L300,119.0 L320,115.6 L340,113.0 L360,112.4 L380,114.2 L400,117.4 L420,120.4 L440,121.9 L460,121.0 L480,118.2 L500,114.9 L520,112.7 L540,112.7 L560,115.0 L580,118.3 L600,121.1 L620,122.0 L640,120.4 L660,117.3 L680,114.2 L700,112.5 L720,113.2 L740,115.9 L760,119.2 L780,121.6 L800,121.8 L820,119.8 L840,116.5 L860,113.6 L880,112.5 L900,113.8 L920,116.8 L940,120.1 L960,122.0 L980,121.5 L1000,119.0 L1020,115.7 L1040,113.1 L1060,112.7 L1080,114.6 L1100,117.8 L1120,120.8 L1140,122.1 L1160,121.1 L1180,118.2 L1200,114.9 L1220,112.9 L1240,113.0 L1260,115.4 L1280,118.8 L1300,121.5 L1320,122.2 L1340,120.5 L1360,117.4 L1380,114.2 L1400,112.7"/></g>
+        <g class="causB" opacity=".16"><path d="M-300,25.1 L-280,28.4 L-260,29.5 L-240,27.6 L-220,24.0 L-200,20.9 L-180,20.3 L-160,22.6 L-140,26.2 L-120,28.7 L-100,28.4 L-80,25.5 L-60,21.8 L-40,19.7 L-20,20.5 L0,23.7 L20,27.1 L40,28.4 L60,26.7 L80,23.1 L100,19.9 L120,19.1 L140,21.2 L160,24.8 L180,27.4 L200,27.4 L220,24.6 L240,20.9 L260,18.6 L280,19.2 L300,22.2 L320,25.7 L340,27.2 L360,25.8 L380,22.3 L400,19.0 L420,17.9 L440,19.8 L460,23.3 L480,26.2 L500,26.4 L520,23.8 L540,20.0 L560,17.5 L580,17.9 L600,20.8 L620,24.3 L640,26.1 L660,24.9 L680,21.5 L700,18.0 L720,16.7 L740,18.4 L760,21.9 L780,24.9 L800,25.3 L820,22.9 L840,19.2 L860,16.5 L880,16.6 L900,19.3 L920,22.9 L940,24.9 L960,23.9 L980,20.7 L1000,17.1 L1020,15.6 L1040,17.0 L1060,20.4 L1080,23.5 L1100,24.3 L1120,22.1 L1140,18.3 L1160,15.5 L1180,15.3 L1200,17.9 L1220,21.5 L1240,23.7 L1260,23.0 L1280,19.8 L1300,16.2 L1320,14.4 L1340,15.6 L1360,19.0 L1380,22.2 L1400,23.2"/><path d="M-300,26.4 L-280,30.8 L-260,32.2 L-240,29.9 L-220,26.5 L-200,25.3 L-180,27.9 L-160,32.8 L-140,36.4 L-120,36.5 L-100,33.5 L-80,30.4 L-60,30.5 L-40,34.2 L-20,39.0 L0,41.6 L20,40.4 L40,37.0 L60,34.7 L80,36.1 L100,40.6 L120,45.0 L140,46.3 L160,44.0 L180,40.6 L200,39.5 L220,42.1 L240,46.9 L260,50.6 L280,50.6 L300,47.6 L320,44.6 L340,44.6 L360,48.3 L380,53.2 L400,55.7 L420,54.5 L440,51.1 L460,48.9 L480,50.3 L500,54.7 L520,59.1 L540,60.4 L560,58.1 L580,54.7 L600,53.6 L620,56.2 L640,61.1 L660,64.7 L680,64.7 L700,61.7 L720,58.7 L740,58.8 L760,62.5 L780,67.3 L800,69.9 L820,68.6 L840,65.2 L860,63.0 L880,64.4 L900,68.9 L920,73.3 L940,74.6 L960,72.3 L980,68.8 L1000,67.7 L1020,70.4 L1040,75.2 L1060,78.8 L1080,78.8 L1100,75.8 L1120,72.8 L1140,72.9 L1160,76.6 L1180,81.5 L1200,84.0 L1220,82.7 L1240,79.3 L1260,77.1 L1280,78.5 L1300,83.0 L1320,87.4 L1340,88.7 L1360,86.4 L1380,83.0 L1400,81.8"/><path d="M-300,39.4 L-280,43.6 L-260,45.9 L-240,45.4 L-220,42.8 L-200,39.9 L-180,38.6 L-160,40.1 L-140,43.9 L-120,48.4 L-100,51.4 L-80,51.7 L-60,49.5 L-40,46.5 L-20,44.6 L0,45.2 L20,48.5 L40,53.0 L60,56.6 L80,57.8 L100,56.2 L120,53.2 L140,50.8 L160,50.6 L180,53.2 L200,57.6 L220,61.6 L240,63.6 L260,62.8 L280,60.0 L300,57.2 L320,56.2 L340,58.1 L360,62.1 L380,66.4 L400,69.2 L420,69.1 L440,66.8 L460,63.7 L480,62.1 L500,63.1 L520,66.6 L540,71.1 L560,74.5 L580,75.3 L600,73.5 L620,70.4 L640,68.2 L660,68.4 L680,71.3 L700,75.7 L720,79.6 L740,81.2 L760,80.1 L780,77.2 L800,74.5 L820,73.9 L840,76.1 L860,80.2 L880,84.5 L900,86.9 L920,86.5 L940,84.0 L960,81.0 L980,79.7 L1000,81.0 L1020,84.8 L1040,89.2 L1060,92.3 L1080,92.8 L1100,90.7 L1120,87.7 L1140,85.7 L1160,86.2 L1180,89.4 L1200,93.9 L1220,97.5 L1240,98.8 L1260,97.4 L1280,94.4 L1300,91.9 L1320,91.6 L1340,94.1 L1360,98.4 L1380,102.5 L1400,104.6"/><path d="M-300,52.4 L-280,56.0 L-260,57.5 L-240,56.1 L-220,53.6 L-200,52.2 L-180,53.7 L-160,57.3 L-140,61.0 L-120,62.4 L-100,61.1 L-80,58.5 L-60,57.2 L-40,58.6 L-20,62.3 L0,66.0 L20,67.4 L40,66.0 L60,63.5 L80,62.1 L100,63.6 L120,67.3 L140,70.9 L160,72.4 L180,71.0 L200,68.4 L220,67.1 L240,68.6 L260,72.3 L280,75.9 L300,77.3 L320,76.0 L340,73.4 L360,72.1 L380,73.5 L400,77.2 L420,80.9 L440,82.3 L460,80.9 L480,78.3 L500,77.0 L520,78.5 L540,82.2 L560,85.8 L580,87.2 L600,85.9 L620,83.3 L640,82.0 L660,83.5 L680,87.2 L700,90.8 L720,92.2 L740,90.8 L760,88.3 L780,87.0 L800,88.5 L820,92.1 L840,95.8 L860,97.2 L880,95.8 L900,93.2 L920,91.9 L940,93.4 L960,97.1 L980,100.8 L1000,102.1 L1020,100.7 L1040,98.2 L1060,96.9 L1080,98.4 L1100,102.1 L1120,105.7 L1140,107.1 L1160,105.7 L1180,103.1 L1200,101.9 L1220,103.4 L1240,107.1 L1260,110.7 L1280,112.1 L1300,110.7 L1320,108.1 L1340,106.8 L1360,108.3 L1380,112.0 L1400,115.7"/><path d="M-300,85.1 L-280,89.6 L-260,87.7 L-240,80.9 L-220,77.1 L-200,80.3 L-180,85.7 L-160,85.7 L-140,79.6 L-120,74.3 L-100,75.7 L-80,81.3 L-60,83.3 L-40,78.4 L-20,72.0 L0,71.4 L20,76.6 L40,80.2 L60,77.0 L80,70.2 L100,67.7 L120,71.8 L140,76.6 L160,75.4 L180,68.8 L200,64.4 L220,67.0 L240,72.5 L260,73.3 L280,67.5 L300,61.8 L320,62.5 L340,68.0 L360,70.6 L380,66.2 L400,59.7 L420,58.4 L440,63.3 L460,67.4 L480,64.8 L500,58.0 L520,54.8 L540,58.5 L560,63.6 L580,63.0 L600,56.6 L620,51.8 L640,53.8 L660,59.4 L680,60.7 L700,55.4 L720,49.3 L740,49.4 L760,54.8 L780,57.9 L800,54.1 L820,47.4 L840,45.5 L860,50.0 L880,54.5 L900,52.5 L920,45.8 L940,42.0 L960,45.2 L980,50.6 L1000,50.6 L1020,44.5 L1040,39.2 L1060,40.6 L1080,46.2 L1100,48.1 L1120,43.3 L1140,36.9 L1160,36.3 L1180,41.5 L1200,45.1 L1220,41.9 L1240,35.1 L1260,32.5 L1280,36.7 L1300,41.5 L1320,40.2 L1340,33.6 L1360,29.3 L1380,31.9 L1400,37.4"/><path d="M-300,95.2 L-280,98.9 L-260,97.0 L-240,91.5 L-220,89.4 L-200,93.1 L-180,96.8 L-160,94.9 L-140,89.4 L-120,87.3 L-100,91.0 L-80,94.7 L-60,92.9 L-40,87.4 L-20,85.3 L0,88.9 L20,92.7 L40,90.8 L60,85.4 L80,83.2 L100,86.7 L120,90.6 L140,88.8 L160,83.3 L180,81.1 L200,84.6 L220,88.5 L240,86.8 L260,81.3 L280,79.0 L300,82.5 L320,86.4 L340,84.7 L360,79.2 L380,76.9 L400,80.4 L420,84.3 L440,82.7 L460,77.2 L480,74.8 L500,78.2 L520,82.2 L540,80.6 L560,75.2 L580,72.7 L600,76.1 L620,80.1 L640,78.6 L660,73.1 L680,70.7 L700,74.0 L720,78.0 L740,76.6 L760,71.1 L780,68.6 L800,71.9 L820,75.9 L840,74.5 L860,69.1 L880,66.5 L900,69.8 L920,73.8 L940,72.5 L960,67.0 L980,64.4 L1000,67.6 L1020,71.7 L1040,70.4 L1060,65.0 L1080,62.3 L1100,65.5 L1120,69.6 L1140,68.4 L1160,63.0 L1180,60.2 L1200,63.4 L1220,67.5 L1240,66.4 L1260,60.9 L1280,58.2 L1300,61.3 L1320,65.4 L1340,64.3 L1360,58.9 L1380,56.1 L1400,59.2"/><path d="M-300,95.2 L-280,98.0 L-260,99.3 L-240,98.4 L-220,96.3 L-200,94.6 L-180,94.9 L-160,97.2 L-140,100.3 L-120,102.4 L-100,102.4 L-80,100.6 L-60,98.6 L-40,97.9 L-20,99.3 L0,102.3 L20,105.0 L40,106.1 L60,105.0 L80,102.8 L100,101.3 L120,101.8 L140,104.3 L160,107.3 L180,109.3 L200,109.1 L220,107.2 L240,105.2 L260,104.7 L280,106.4 L300,109.4 L320,112.0 L340,112.8 L360,111.5 L380,109.3 L400,108.0 L420,108.8 L440,111.4 L460,114.4 L480,116.1 L500,115.7 L520,113.7 L540,111.8 L560,111.5 L580,113.4 L600,116.5 L620,119.0 L640,119.5 L660,118.1 L680,115.9 L700,114.8 L720,115.7 L740,118.5 L760,121.4 L780,122.9 L800,122.3 L820,120.2 L840,118.4 L860,118.4 L880,120.5 L900,123.6 L920,125.9 L940,126.2 L960,124.6 L980,122.5 L1000,121.5 L1020,122.7 L1040,125.6 L1060,128.4 L1080,129.7 L1100,128.9 L1120,126.7 L1140,125.1 L1160,125.3 L1180,127.6 L1200,130.7 L1220,132.8 L1240,132.9 L1260,131.1 L1280,129.0 L1300,128.3 L1320,129.7 L1340,132.7 L1360,135.4 L1380,136.5 L1400,135.4"/><path d="M-300,109.8 L-280,115.4 L-260,114.5 L-240,108.7 L-220,105.5 L-200,109.3 L-180,115.9 L-160,117.5 L-140,112.7 L-120,107.7 L-100,109.2 L-80,115.7 L-60,119.7 L-40,116.6 L-20,110.8 L0,109.7 L20,115.1 L40,120.9 L60,120.2 L80,114.4 L100,111.0 L120,114.7 L140,121.2 L160,123.1 L180,118.4 L200,113.3 L220,114.6 L240,121.0 L260,125.2 L280,122.3 L300,116.4 L320,115.1 L340,120.5 L360,126.3 L380,125.9 L400,120.1 L420,116.6 L440,120.0 L460,126.6 L480,128.7 L500,124.1 L520,118.9 L540,120.0 L560,126.4 L580,130.7 L600,128.1 L620,122.1 L640,120.6 L660,125.8 L680,131.8 L700,131.5 L720,125.9 L740,122.1 L760,125.4 L780,132.0 L800,134.3 L820,129.9 L840,124.6 L860,125.4 L880,131.7 L900,136.2 L920,133.8 L940,127.8 L960,126.1 L980,131.2 L1000,137.2 L1020,137.2 L1040,131.6 L1060,127.7 L1080,130.7 L1100,137.4 L1120,139.9 L1140,135.6 L1160,130.2 L1180,130.8 L1200,137.0 L1220,141.7 L1240,139.5 L1260,133.5 L1280,131.6 L1300,136.5 L1320,142.6 L1340,142.8 L1360,137.3 L1380,133.3 L1400,136.1"/></g>
+      </g>
+
+      <g class="pl pl-far" fill="#CFF6FF" filter="url(#soft)"><circle cx="259.1" cy="52.1" r="0.83" opacity="0.16"/><circle cx="428.7" cy="92.0" r="0.53" opacity="0.25"/><circle cx="30.0" cy="104.7" r="0.53" opacity="0.17"/><circle cx="339.6" cy="177.8" r="0.56" opacity="0.19"/><circle cx="501.9" cy="200.3" r="0.79" opacity="0.23"/><circle cx="781.0" cy="32.7" r="0.93" opacity="0.21"/><circle cx="115.4" cy="45.9" r="0.65" opacity="0.31"/><circle cx="144.6" cy="132.2" r="0.82" opacity="0.22"/><circle cx="438.2" cy="35.7" r="0.53" opacity="0.19"/><circle cx="544.3" cy="103.5" r="0.66" opacity="0.27"/><circle cx="362.5" cy="79.8" r="0.90" opacity="0.29"/><circle cx="195.3" cy="130.8" r="0.76" opacity="0.33"/><circle cx="583.6" cy="77.6" r="0.99" opacity="0.17"/><circle cx="334.5" cy="164.8" r="0.58" opacity="0.25"/><circle cx="31.4" cy="148.3" r="0.88" opacity="0.26"/><circle cx="700.4" cy="82.4" r="0.85" opacity="0.27"/><circle cx="463.9" cy="108.9" r="0.92" opacity="0.34"/><circle cx="379.3" cy="147.5" r="0.53" opacity="0.29"/><circle cx="517.7" cy="208.7" r="0.91" opacity="0.21"/><circle cx="308.6" cy="148.4" r="0.51" opacity="0.24"/><circle cx="134.4" cy="45.8" r="0.53" opacity="0.30"/><circle cx="103.5" cy="70.1" r="0.70" opacity="0.32"/><circle cx="64.5" cy="107.5" r="0.77" opacity="0.33"/><circle cx="655.4" cy="184.7" r="0.64" opacity="0.23"/><circle cx="287.0" cy="188.5" r="0.98" opacity="0.18"/><circle cx="141.0" cy="67.1" r="0.62" opacity="0.25"/><circle cx="471.3" cy="72.9" r="0.50" opacity="0.23"/><circle cx="295.4" cy="129.3" r="0.98" opacity="0.29"/><circle cx="412.4" cy="138.9" r="0.84" opacity="0.16"/><circle cx="719.6" cy="169.1" r="0.94" opacity="0.31"/><circle cx="313.9" cy="98.2" r="0.55" opacity="0.28"/><circle cx="49.8" cy="36.5" r="0.60" opacity="0.18"/><circle cx="272.0" cy="33.8" r="0.50" opacity="0.18"/><circle cx="81.2" cy="91.6" r="0.51" opacity="0.32"/><circle cx="1059.1" cy="52.1" r="0.83" opacity="0.16"/><circle cx="1228.7" cy="92.0" r="0.53" opacity="0.25"/><circle cx="830.0" cy="104.7" r="0.53" opacity="0.17"/><circle cx="1139.6" cy="177.8" r="0.56" opacity="0.19"/><circle cx="1301.9" cy="200.3" r="0.79" opacity="0.23"/><circle cx="1581.0" cy="32.7" r="0.93" opacity="0.21"/><circle cx="915.4" cy="45.9" r="0.65" opacity="0.31"/><circle cx="944.6" cy="132.2" r="0.82" opacity="0.22"/><circle cx="1238.2" cy="35.7" r="0.53" opacity="0.19"/><circle cx="1344.3" cy="103.5" r="0.66" opacity="0.27"/><circle cx="1162.5" cy="79.8" r="0.90" opacity="0.29"/><circle cx="995.3" cy="130.8" r="0.76" opacity="0.33"/><circle cx="1383.6" cy="77.6" r="0.99" opacity="0.17"/><circle cx="1134.5" cy="164.8" r="0.58" opacity="0.25"/><circle cx="831.4" cy="148.3" r="0.88" opacity="0.26"/><circle cx="1500.4" cy="82.4" r="0.85" opacity="0.27"/><circle cx="1263.9" cy="108.9" r="0.92" opacity="0.34"/><circle cx="1179.3" cy="147.5" r="0.53" opacity="0.29"/><circle cx="1317.7" cy="208.7" r="0.91" opacity="0.21"/><circle cx="1108.6" cy="148.4" r="0.51" opacity="0.24"/><circle cx="934.4" cy="45.8" r="0.53" opacity="0.30"/><circle cx="903.5" cy="70.1" r="0.70" opacity="0.32"/><circle cx="864.5" cy="107.5" r="0.77" opacity="0.33"/><circle cx="1455.4" cy="184.7" r="0.64" opacity="0.23"/><circle cx="1087.0" cy="188.5" r="0.98" opacity="0.18"/><circle cx="941.0" cy="67.1" r="0.62" opacity="0.25"/><circle cx="1271.3" cy="72.9" r="0.50" opacity="0.23"/><circle cx="1095.4" cy="129.3" r="0.98" opacity="0.29"/><circle cx="1212.4" cy="138.9" r="0.84" opacity="0.16"/><circle cx="1519.6" cy="169.1" r="0.94" opacity="0.31"/><circle cx="1113.9" cy="98.2" r="0.55" opacity="0.28"/><circle cx="849.8" cy="36.5" r="0.60" opacity="0.18"/><circle cx="1072.0" cy="33.8" r="0.50" opacity="0.18"/><circle cx="881.2" cy="91.6" r="0.51" opacity="0.32"/></g>
+
+      <!-- tiburón lejano (profundidad) -->
+      <g class="farShark"><g transform="scale(-.34 .34)"><use href="#silueta" fill="#051B24" filter="url(#haze)" opacity=".85"/></g></g>
+
+      <g class="pl pl-mid" fill="#DDF8FF"><circle cx="491.3" cy="51.6" r="0.98" opacity="0.29"/><circle cx="291.3" cy="46.8" r="1.39" opacity="0.45"/><circle cx="372.8" cy="114.0" r="0.86" opacity="0.23"/><circle cx="274.1" cy="73.2" r="1.38" opacity="0.24"/><circle cx="18.5" cy="200.9" r="1.17" opacity="0.24"/><circle cx="434.5" cy="29.0" r="1.17" opacity="0.44"/><circle cx="690.7" cy="153.5" r="0.98" opacity="0.29"/><circle cx="133.6" cy="167.6" r="1.17" opacity="0.39"/><circle cx="263.7" cy="65.5" r="1.37" opacity="0.45"/><circle cx="682.1" cy="173.9" r="1.37" opacity="0.38"/><circle cx="181.4" cy="120.3" r="1.05" opacity="0.21"/><circle cx="22.3" cy="76.0" r="0.98" opacity="0.37"/><circle cx="765.2" cy="107.2" r="1.46" opacity="0.45"/><circle cx="764.0" cy="91.8" r="0.95" opacity="0.26"/><circle cx="157.4" cy="62.0" r="1.24" opacity="0.43"/><circle cx="672.3" cy="113.2" r="1.26" opacity="0.40"/><circle cx="67.8" cy="146.9" r="1.44" opacity="0.40"/><circle cx="600.1" cy="112.9" r="0.92" opacity="0.40"/><circle cx="266.0" cy="173.0" r="1.48" opacity="0.30"/><circle cx="321.1" cy="200.1" r="1.31" opacity="0.24"/><circle cx="1291.3" cy="51.6" r="0.98" opacity="0.29"/><circle cx="1091.3" cy="46.8" r="1.39" opacity="0.45"/><circle cx="1172.8" cy="114.0" r="0.86" opacity="0.23"/><circle cx="1074.1" cy="73.2" r="1.38" opacity="0.24"/><circle cx="818.5" cy="200.9" r="1.17" opacity="0.24"/><circle cx="1234.5" cy="29.0" r="1.17" opacity="0.44"/><circle cx="1490.7" cy="153.5" r="0.98" opacity="0.29"/><circle cx="933.6" cy="167.6" r="1.17" opacity="0.39"/><circle cx="1063.7" cy="65.5" r="1.37" opacity="0.45"/><circle cx="1482.1" cy="173.9" r="1.37" opacity="0.38"/><circle cx="981.4" cy="120.3" r="1.05" opacity="0.21"/><circle cx="822.3" cy="76.0" r="0.98" opacity="0.37"/><circle cx="1565.2" cy="107.2" r="1.46" opacity="0.45"/><circle cx="1564.0" cy="91.8" r="0.95" opacity="0.26"/><circle cx="957.4" cy="62.0" r="1.24" opacity="0.43"/><circle cx="1472.3" cy="113.2" r="1.26" opacity="0.40"/><circle cx="867.8" cy="146.9" r="1.44" opacity="0.40"/><circle cx="1400.1" cy="112.9" r="0.92" opacity="0.40"/><circle cx="1066.0" cy="173.0" r="1.48" opacity="0.30"/><circle cx="1121.1" cy="200.1" r="1.31" opacity="0.24"/></g>
+
+      <g transform="translate(170 118)"><g class="bl bl0"><g class="tumble ta"><use href="#nota" transform="rotate(-8)"/></g></g></g>
+      <g transform="translate(198 116)"><circle class="fl fl0" r="16" fill="url(#flashG)"/></g>
+      <g transform="translate(360 132)"><g class="bl bl1"><g class="tumble tb"><use href="#nota" transform="rotate(6)"/></g></g></g>
+      <g transform="translate(388 130)"><circle class="fl fl1" r="16" fill="url(#flashG)"/></g>
+      <g transform="translate(545 114)"><g class="bl bl2"><g class="tumble tc"><use href="#nota" transform="rotate(-4)"/></g></g></g>
+      <g transform="translate(573 112)"><circle class="fl fl2" r="16" fill="url(#flashG)"/></g>
+      <g transform="translate(725 128)"><g class="bl bl3"><g class="tumble td"><use href="#nota" transform="rotate(9)"/></g></g></g>
+      <g transform="translate(753 126)"><circle class="fl fl3" r="16" fill="url(#flashG)"/></g>
+
+      <g class="shark2">
+        <g class="sway">
+          <ellipse cx="120" cy="92" rx="120" ry="10" fill="#01080C" opacity=".35" filter="url(#haze)"/>
+          <g transform="scale(0.78)">
+            <g class="wake" fill="none" stroke="#CFF6FF" stroke-linecap="round" opacity=".35">
+              <path d="M-20 -6 H-90" stroke-width="1.2"/><path d="M-26 8 H-120" stroke-width=".8"/><path d="M-10 -18 H-70" stroke-width=".6"/>
+            </g>
+            <g class="tail2"><path d="M34 1 C20 -10 6 -30 -8 -52 C-4 -30 -6 -12 -2 0 C-6 10 -8 20 -14 34 C0 24 16 12 34 4 Z" fill="url(#finG)"/>
+              <path d="M28 -2 C18 -12 8 -28 -4 -46" stroke="#6F8C9B" stroke-width="1" fill="none" opacity=".5"/></g>
+            <path d="M58 -8 L50 -19 L68 -7 Z" fill="url(#finG)"/>
+            <path d="M78 16 L64 30 L90 18 Z" fill="url(#finG)"/>
+            <path d="M150 -35 C145 -55 132 -72 120 -80 C124 -62 122 -45 116 -32 Z" fill="url(#finG)"/>
+            <path d="M146 -38 C141 -54 131 -68 122 -76" stroke="#7FA0AF" stroke-width="1" fill="none" opacity=".45"/>
+            <path d="M30 0 C60 -10 95 -30 140 -34 C180 -37 212 -26 232 -8 C236 -4 236 2 230 6 C218 14 200 20 176 22 C140 26 90 22 60 12 C45 8 36 5 30 2 Z" fill="url(#dorsum)"/>
+            <path d="M44 6 C80 9 118 6 150 9 C168 11 176 6 190 8 C208 9 222 3 234 -1 C236 2 234 4 230 6 C218 14 200 20 176 22 C140 26 90 22 60 12 Z" fill="url(#belly)"/>
+            <path d="M30 0 C60 -10 95 -30 140 -34 C180 -37 212 -26 232 -8 C236 -4 236 2 230 6 C218 14 200 20 176 22 C140 26 90 22 60 12 C45 8 36 5 30 2 Z" fill="url(#rim)"/>
+            <path d="M72 -14 C110 -30 168 -36 214 -20" stroke="url(#spec)" stroke-width="3" fill="none" stroke-linecap="round" filter="url(#soft)"/>
+            <g stroke="#1B2A33" stroke-width="1.2" fill="none" opacity=".55" stroke-linecap="round">
+              <path d="M166 -12 Q162 -2 165 9"/><path d="M172 -13 Q168 -2 171 10"/><path d="M178 -14 Q174 -2 177 11"/><path d="M184 -14 Q180 -2 183 12"/>
+            </g>
+            <path d="M160 16 C148 30 128 46 108 56 C118 42 130 28 138 18 Z" fill="url(#finG)"/>
+            <path d="M156 18 C144 30 128 42 114 51" stroke="#7FA0AF" stroke-width="1" fill="none" opacity=".4"/>
+            <g class="jaw2">
+              <path d="M192 12 Q212 16 228 7" stroke="#0E1A20" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M198 13.5 l1.6 2.6 1.6-2.3 1.6 2.6 1.6-2.4 1.6 2.4 1.6-2.4 1.6 2.2 1.6-2.4 1.6 2" stroke="#F4F8F9" stroke-width=".9" fill="none" stroke-linejoin="round"/>
+            </g>
+            <circle cx="207" cy="-11" r="3.4" fill="#050A0D"/>
+            <circle cx="208.2" cy="-12.2" r="1" fill="#E9FBFF"/>
+            <path d="M226 -6 Q231 -3 230 1" stroke="#0E1A20" stroke-width=".8" fill="none" opacity=".6"/>
+          </g>
+        </g>
+      </g>
+
+      <text class="gn gn0" x="196" y="96" text-anchor="middle">+$100</text>
+      <text class="gn gn1" x="386" y="110" text-anchor="middle">+$100</text>
+      <text class="gn gn2" x="571" y="92" text-anchor="middle">+$100</text>
+      <text class="gn gn3" x="751" y="106" text-anchor="middle">+$100</text>
+
+      <g class="pl pl-near" fill="#E9FBFF" filter="url(#haze)"><circle cx="101.6" cy="52.1" r="2.69" opacity="0.27"/><circle cx="116.9" cy="177.7" r="2.78" opacity="0.24"/><circle cx="280.3" cy="126.1" r="1.76" opacity="0.12"/><circle cx="776.7" cy="144.8" r="2.23" opacity="0.29"/><circle cx="347.0" cy="186.1" r="2.59" opacity="0.16"/><circle cx="201.5" cy="78.5" r="1.89" opacity="0.23"/><circle cx="207.5" cy="101.9" r="1.76" opacity="0.28"/><circle cx="283.0" cy="109.2" r="2.30" opacity="0.28"/><circle cx="901.6" cy="52.1" r="2.69" opacity="0.27"/><circle cx="916.9" cy="177.7" r="2.78" opacity="0.24"/><circle cx="1080.3" cy="126.1" r="1.76" opacity="0.12"/><circle cx="1576.7" cy="144.8" r="2.23" opacity="0.29"/><circle cx="1147.0" cy="186.1" r="2.59" opacity="0.16"/><circle cx="1001.5" cy="78.5" r="1.89" opacity="0.23"/><circle cx="1007.5" cy="101.9" r="1.76" opacity="0.28"/><circle cx="1083.0" cy="109.2" r="2.30" opacity="0.28"/></g>
+
+      <!-- superficie con reflejos -->
+      <rect width="800" height="34" fill="url(#surf)"/>
+      <g fill="none" stroke="#E9FBFF" stroke-linecap="round">
+        <path class="rf1" d="M0 8 Q40 3 80 8 T160 8 T240 8 T320 8 T400 8 T480 8 T560 8 T640 8 T720 8 T800 8 T880 8 T960 8 T1040 8 T1120 8 T1200 8" stroke-width="1.2" opacity=".45"/>
+        <path class="rf2" d="M0 16 Q55 11 110 16 T220 16 T330 16 T440 16 T550 16 T660 16 T770 16 T880 16 T990 16 T1100 16 T1210 16" stroke-width=".8" opacity=".25"/>
+      </g>
+      <rect width="800" height="220" fill="url(#vig)"/>
+    </svg>
+  </div>
+  <section class="hero">
+    <h1>Antes de vender, veamos desde dónde partes.</h1>
+    <p>Seis preguntas. Responde con tus palabras y con detalles reales: la IA trabaja solo con lo que escribas aquí, así que mientras más concreto seas, más útil será tu diagnóstico.</p>
+  </section>
+  <ol class="qs" id="qs">
+    <li class="q" id="q1">
+      <div class="qn">1<small>de 6</small></div>
+      <div class="body">
+        <span class="ql" id="q1l">¿Dónde estás hoy?</span>
+        <p class="help">Elige la opción que más se parece a tu situación.</p>
+        <div class="chips" role="radiogroup" aria-labelledby="q1l" data-field="puntoPartida">
+          <button type="button" class="chip" role="radio" aria-checked="false" data-value="cero">Empiezo desde cero<small>No tengo idea ni negocio todavía</small></button>
+          <button type="button" class="chip" role="radio" aria-checked="false" data-value="idea">Tengo una idea<small>Pero no la he lanzado</small></button>
+          <button type="button" class="chip" role="radio" aria-checked="false" data-value="existente">Ya tengo algo<small>Pero no logro venderlo</small></button>
+        </div>
+      </div>
+    </li>
+
+    <li class="q" id="q2">
+      <div class="qn">2<small>de 6</small></div>
+      <div class="body">
+        <label class="ql" for="habilidades">¿Qué sabes hacer bien?</label>
+        <p class="help">Habilidades técnicas o personales. Ejemplo: "edito videos en CapCut, organizo eventos, explico matemáticas con paciencia".</p>
+        <textarea id="habilidades" data-field="habilidades"></textarea>
+      </div>
+    </li>
+
+    <li class="q" id="q3">
+      <div class="qn">3<small>de 6</small></div>
+      <div class="body">
+        <label class="ql" for="experiencia">¿Qué experiencia tienes y en qué te pide ayuda la gente?</label>
+        <p class="help">Trabajos, estudios, cosas que viviste o resolviste. Lo que otros te preguntan suele ser una pista de algo vendible.</p>
+        <textarea id="experiencia" data-field="experiencia"></textarea>
+      </div>
+    </li>
+
+    <li class="q" id="q4">
+      <div class="qn">4<small>de 6</small></div>
+      <div class="body">
+        <label class="ql" for="ideaActual" id="q4l">Cuéntame tu idea o lo que ya tienes</label>
+        <p class="help" id="q4h">Primero elige tu situación en la pregunta 1.</p>
+        <textarea id="ideaActual" data-field="ideaActual"></textarea>
+      </div>
+    </li>
+
+    <li class="q" id="q5">
+      <div class="qn">5<small>de 6</small></div>
+      <div class="body">
+        <span class="ql" id="q5l">¿Qué quieres lograr?</span>
+        <p class="help">Elige tu objetivo principal y escribe una meta concreta.</p>
+        <div class="chips" role="radiogroup" aria-labelledby="q5l" data-field="objetivoTipo">
+          <button type="button" class="chip" role="radio" aria-checked="false" data-value="Ingreso extra">Ingreso extra</button>
+          <button type="button" class="chip" role="radio" aria-checked="false" data-value="Reemplazar mi sueldo">Reemplazar mi sueldo</button>
+          <button type="button" class="chip" role="radio" aria-checked="false" data-value="Hacer crecer mi negocio">Hacer crecer mi negocio</button>
+        </div>
+        <input type="text" class="gap" id="meta" data-field="meta" placeholder="Ej. 500 USD al mes en 3 meses" aria-label="Meta concreta">
+      </div>
+    </li>
+
+    <li class="q" id="q6">
+      <div class="qn">6<small>de 6</small></div>
+      <div class="body">
+        <span class="ql">¿Con qué cuentas hoy?</span>
+        <p class="help">Esto define qué caminos son realistas para ti ahora mismo.</p>
+        <div class="row2">
+          <div>
+            <label for="tiempo">Tiempo por semana</label>
+            <select id="tiempo" data-field="tiempo">
+              <option value="">Elige</option>
+              <option>Menos de 3 horas</option>
+              <option>De 3 a 7 horas</option>
+              <option>De 8 a 15 horas</option>
+              <option>Más de 15 horas</option>
+            </select>
+          </div>
+          <div>
+            <label for="presupuesto">Dinero para invertir</label>
+            <select id="presupuesto" data-field="presupuesto">
+              <option value="">Elige</option>
+              <option>Nada por ahora</option>
+              <option>Menos de 100 USD</option>
+              <option>De 100 a 500 USD</option>
+              <option>Más de 500 USD</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </li>
+  </ol>
+
+  <div class="action">
+    <button class="btn btn-primary" id="analyze" type="button">Analizar mi situación</button>
+    <span class="note" id="formNote" role="status"></span>
+  </div>
+
+  <div class="thinking" id="thinking" role="status" aria-live="polite">
+    <div class="spin" aria-hidden="true"></div>
+    <div class="msg" id="thinkingMsg">Leyendo tus respuestas</div>
+    <button class="btn btn-ghost" id="stop" type="button" style="width:auto;padding:10px 16px">Detener</button>
+  </div>
+
+  <section class="result" id="result" aria-live="polite"></section>
+  </div>
+
+  <!-- ===== VISTA: ÁREAS ===== -->
+  <div class="view area" id="v-area"></div>
+
+  <footer>La IA propone, tú decides. Nada aquí garantiza ingresos: lo que cuenta es lo que ejecutas.</footer>
+</div>
+
+<dialog id="projectDlg" aria-labelledby="dlgTitle">
+  <div class="dlg">
+    <div class="dlg-head">
+      <h2 id="dlgTitle">Mi Proyecto</h2>
+      <button class="x" id="closeDlg" type="button" aria-label="Cerrar">✕</button>
+    </div>
+    <div id="projectBody"></div>
+  </div>
+</dialog>
+
+<dialog id="confirmDlg" aria-labelledby="confirmMsg">
+  <div class="dlg">
+    <p id="confirmMsg" style="font-weight:600;font-size:1.05rem;margin:0 0 18px"></p>
+    <div class="btnrow" style="justify-content:flex-end">
+      <button class="btn-sm" id="confirmNo" type="button">Cancelar</button>
+      <button class="btn-sm on" id="confirmOk" type="button">Sí, continuar</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="codeDlg" aria-labelledby="codeTitle">
+  <div class="dlg">
+    <h2 id="codeTitle" style="font-family:var(--display);margin:0 0 8px">Código de acceso</h2>
+    <p style="margin:0 0 12px;color:var(--muted)">Escribe el código para usar las funciones con IA.</p>
+    <input type="text" id="codeIn" autocomplete="off" aria-label="Código de acceso">
+    <div class="btnrow" style="justify-content:flex-end;margin-top:14px">
+      <button class="btn-sm" id="codeNo" type="button">Cancelar</button>
+      <button class="btn-sm on" id="codeOk" type="button">Continuar</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="iosDlg" aria-labelledby="iosTitle">
+  <div class="dlg">
+    <h2 id="iosTitle" style="font-family:var(--display);margin:0 0 10px">Instalar en iPhone</h2>
+    <ol style="margin:0 0 16px;padding-left:20px;line-height:1.8">
+      <li>Toca el botón <b>Compartir</b> de Safari.</li>
+      <li>Elige <b>Agregar a pantalla de inicio</b>.</li>
+      <li>Toca <b>Agregar</b>.</li>
+    </ol>
+    <div class="btnrow" style="justify-content:flex-end"><button class="btn-sm on" id="iosOk" type="button">Entendido</button></div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* =========================================================
+   PWA: IA a través de /api/claude (Netlify Function) +
+   instalación + funcionamiento sin conexión.
+   Reemplaza el runtime de claude.ai con la misma interfaz.
+   ========================================================= */
+(function(){
+  function pedirCodigo(){
+    return new Promise(res => {
+      const d = document.getElementById('codeDlg'), i = document.getElementById('codeIn');
+      const fin = v => { d.close(); res(v); };
+      document.getElementById('codeOk').onclick = () => { const v = i.value.trim(); if (!v) return; try{ localStorage.setItem('access-code', v); }catch(e){} fin(true); };
+      document.getElementById('codeNo').onclick = () => fin(false);
+      d.oncancel = () => fin(false);
+      i.value = ''; d.showModal(); setTimeout(() => i.focus(), 0);
+    });
+  }
+  async function llamar(input, opts = {}, intento = 0){
+    if (!navigator.onLine) throw { code:'offline', message:'Sin conexión' };
+    const messages = typeof input === 'string' ? [{ role:'user', content:input }] : input;
+    let code = ''; try{ code = localStorage.getItem('access-code') || ''; }catch(e){}
+    let r;
+    try{
+      r = await fetch('/api/claude', { method:'POST', signal: opts.signal,
+        headers:{ 'content-type':'application/json', 'x-access-code': code },
+        body: JSON.stringify({ messages, tier: opts.modelTier || 'default' }) });
+    }catch(e){
+      if (e && e.name === 'AbortError') throw { code:'cancelled', message:'Cancelado' };
+      throw { code:'upstream_error', message:'No se pudo conectar' };
+    }
+    let data = {}; try{ data = await r.json(); }catch(e){}
+    if (!r.ok){
+      if (r.status === 401 && intento < 2 && await pedirCodigo()) return llamar(input, opts, intento + 1);
+      throw { code: data.code || 'upstream_error', message: data.message || '' };
+    }
+    if (opts.onText) opts.onText({ text:data.text, delta:data.text });
+    return { text:data.text, truncated: !!data.truncated };
+  }
+  const sample = (input, opts) => llamar(input, opts);
+  sample.json = async (input, opts) => {
+    const { text } = await llamar(input, opts);
+    const t = text.replace(/```json|```/g, '').trim();
+    const a = t.indexOf('{'), b = t.lastIndexOf('}');
+    try{ return JSON.parse(t.slice(a, b + 1)); }catch(e){ throw { code:'invalid_json', message:'Respuesta no válida' }; }
+  };
+  window.claude = { use: async name => name === 'sample' ? sample : null };
+
+  // Service worker
+  if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+
+  // Botón de instalar
+  let evento = null;
+  const btn = document.getElementById('installBtn');
+  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); evento = e; btn.hidden = false; });
+  window.addEventListener('appinstalled', () => { btn.hidden = true; evento = null; });
+  if (ios && !standalone) btn.hidden = false;
+  btn.addEventListener('click', async () => {
+    if (evento){ evento.prompt(); await evento.userChoice; evento = null; btn.hidden = true; }
+    else if (ios){ const d = document.getElementById('iosDlg'); document.getElementById('iosOk').onclick = () => d.close(); d.showModal(); }
+  });
+})();
+</script>
+<script>
+/* =========================================================
+   ARQUITECTURA v2
+   ---------------------------------------------------------
+   Un documento "Mi Proyecto" por usuario:
+   {
+     version: 2, actualizado,
+     etapas: { diagnostico: { respuestas, analisis, caminoElegido, completada } },
+     areas: {
+       oportunidad:  { opciones:[...], elegida:{...} },
+       monetizacion: { modelos:[...], elegido:{...} },
+       oferta:       { nombre, problema, incluye:[], precio:{monto,nota}, propuesta, ok:{campo:true} },
+       clientes:     { canales, mensajes, contenido, plan:[{texto,minutos,hecho}] },
+       ventas:       { practicas:[{escenario, puntaje, fecha}] },
+       lanzamiento:  { hechos:{id:true}, extra:[{id,texto}], contactos, respuestas, clientes, ingresos, numVentas, lectura }
+     }
+   }
+   Cada llamada a la IA recibe ctx(): un resumen de TODO lo guardado,
+   para que los resultados siempre partan de los datos reales del usuario.
+   ========================================================= */
+const AREAS = [
+  { id:'diagnostico', n:'D', nombre:'Diagnóstico', req:null },
+  { id:'descubre', n:1, nombre:'Descubre tu oportunidad', corto:'Oportunidad', req:'diag', lema:'Tres oportunidades hechas con tus habilidades, experiencia y recursos. Elige una.' },
+  { id:'monetiza', n:2, nombre:'Monetiza tu idea', corto:'Monetiza', req:'op', lema:'Formas reales de convertir tu oportunidad en ingresos. Elige cómo vas a cobrar.' },
+  { id:'oferta', n:3, nombre:'Crea tu oferta', corto:'Oferta', req:'op', lema:'La IA arma tu oferta parte por parte. Tú apruebas, cambias o pides otra opción.' },
+  { id:'clientes', n:4, nombre:'Consigue clientes', corto:'Clientes', req:'op', lema:'Dónde buscar, qué decir y qué publicar. Y un plan para hoy.' },
+  { id:'vende', n:5, nombre:'Vende sin miedo', corto:'Vende', req:'op', lema:'La IA hace de cliente. Tú practicas. Sin presión ni trucos: claridad y honestidad.' },
+  { id:'lanza', n:6, nombre:'Lanza y mide', corto:'Lanza', req:'diag', lema:'Tu checklist de lanzamiento y un tablero para registrar lo que pasa.' },
+  { id:'shark', n:'🦈', nombre:'Shark de Ventas', corto:'Shark de Ventas', req:'op', extra:true },
+  { id:'ruta', n:'$', nombre:'Mi Ruta de Ingresos', corto:'Ruta de Ingresos', req:'op', extra:true },
+];
+
+const CHECK_BASE = [
+  { id:'c_op', texto:'Elegir mi oportunidad', auto: p => !!p.areas.oportunidad?.elegida },
+  { id:'c_mod', texto:'Decidir cómo voy a cobrar', auto: p => !!p.areas.monetizacion?.elegido },
+  { id:'c_of', texto:'Tener mi oferta aprobada completa', auto: p => ofertaLista(p) },
+  { id:'c_pago', texto:'Preparar cómo recibir pagos (transferencia, link de pago, etc.)' },
+  { id:'c_lista', texto:'Hacer una lista de 20 posibles clientes' },
+  { id:'c_msg', texto:'Tener listo mi mensaje de contacto', auto: p => !!p.areas.clientes.mensajes?.length },
+  { id:'c_post', texto:'Publicar mi primer contenido de venta' },
+  { id:'c_prac', texto:'Practicar al menos una venta', auto: p => p.areas.ventas.practicas.length > 0 },
+  { id:'c_env', texto:'Enviar 10 mensajes', auto: p => p.areas.lanzamiento.contactos >= 10 },
+  { id:'c_venta', texto:'Cerrar mi primera venta', auto: p => p.areas.lanzamiento.numVentas > 0 },
+];
+
+function proyectoVacio(){
+  return { version:2, actualizado:null,
+    etapas:{ diagnostico:null },
+    areas:{
+      oportunidad:null, monetizacion:null, oferta:null,
+      clientes:{ canales:null, mensajes:null, contenido:null, plan:null },
+      ventas:{ practicas:[] },
+      lanzamiento:{ hechos:{}, extra:[], contactos:0, respuestas:0, clientes:0, ingresos:0, numVentas:0, lectura:null },
+      shark:{ niveles:{}, ejemplos:{} },
+      ruta:{ precio:0, conversion:0, custom:null, logradas:{}, planes:{}, prospectos:[] },
+    }
+  };
+}
+function migrar(g){
+  const p = proyectoVacio();
+  if (!g) return p;
+  p.actualizado = g.actualizado || null;
+  p.etapas.diagnostico = g.etapas?.diagnostico || null;
+  if (g.areas){
+    for (const k of ['oportunidad','monetizacion','oferta']) p.areas[k] = g.areas[k] || null;
+    Object.assign(p.areas.clientes, g.areas.clientes || {});
+    Object.assign(p.areas.ventas, g.areas.ventas || {});
+    Object.assign(p.areas.lanzamiento, g.areas.lanzamiento || {});
+    Object.assign(p.areas.shark, g.areas.shark || {});
+    Object.assign(p.areas.ruta, g.areas.ruta || {});
+  }
+  const d = p.etapas.diagnostico;
+  if (d && !p.areas.oportunidad && d.caminoElegido){
+    p.areas.oportunidad = { opciones: d.analisis?.caminos || [d.caminoElegido], elegida: d.caminoElegido };
+  }
+  return p;
+}
+
+/* ---------- estado de cada área ---------- */
+const OF_CAMPOS = [
+  { k:'nombre', t:'Qué vendes' },
+  { k:'problema', t:'Problema que resuelve' },
+  { k:'incluye', t:'Qué incluye' },
+  { k:'precio', t:'Precio inicial' },
+  { k:'propuesta', t:'Propuesta de valor' },
+];
+function ofertaLista(p){ const o = p.areas.oferta; return !!o && OF_CAMPOS.every(c => o.ok?.[c.k]); }
+function hecho(id, p = proyecto){
+  const a = p.areas;
+  switch(id){
+    case 'diagnostico': return !!p.etapas.diagnostico?.completada;
+    case 'descubre': return !!a.oportunidad?.elegida;
+    case 'monetiza': return !!a.monetizacion?.elegido;
+    case 'oferta': return ofertaLista(p);
+    case 'clientes': return !!(a.clientes.plan?.some(t => t.hecho) || a.lanzamiento.contactos > 0);
+    case 'vende': return a.ventas.practicas.length > 0;
+    case 'lanza': return a.lanzamiento.numVentas > 0;
+    case 'ruta': return Object.keys(a.ruta.logradas).length > 0;
+    case 'shark': return (a.shark.niveles.final?.estrellas || 0) > 0;
+  }
+  return false;
+}
+function disponible(area){
+  if (!area.req) return true;
+  if (area.req === 'diag') return hecho('diagnostico');
+  if (area.req === 'op') return !!proyecto.areas.oportunidad?.elegida;
+  return true;
+}
+function progreso(){ const base = AREAS.filter(a => !a.extra); return Math.round(base.filter(a => hecho(a.id)).length / base.length * 100); }
+
+/* ---------- contexto para la IA ---------- */
+function ctx(){
+  const p = proyecto, d = p.etapas.diagnostico, a = p.areas, L = [];
+  if (d){
+    const r = d.respuestas || {};
+    L.push('PERFIL DEL USUARIO',
+      '- Punto de partida: ' + (PARTIDA[r.puntoPartida] || ''),
+      '- Habilidades: ' + (r.habilidades || ''),
+      '- Experiencia: ' + (r.experiencia || ''),
+      '- Idea o negocio actual: ' + (r.ideaActual || ''),
+      '- Objetivo: ' + (r.objetivoTipo || '') + (r.meta ? ' (meta: ' + r.meta + ')' : ''),
+      '- Tiempo por semana: ' + (r.tiempo || 'no indicó'),
+      '- Dinero para invertir: ' + (r.presupuesto || 'no indicó'));
+    if (d.analisis) L.push('', 'DIAGNÓSTICO', '- ' + d.analisis.resumen, '- Fortalezas: ' + (d.analisis.fortalezas||[]).join('; '), '- Freno principal: ' + (d.analisis.obstaculo_principal||''));
+  }
+  const op = a.oportunidad?.elegida;
+  if (op) L.push('', 'OPORTUNIDAD ELEGIDA', '- ' + op.nombre + ': ' + op.que_es, '- Por qué encaja: ' + (op.por_que_tu||''));
+  const m = a.monetizacion?.elegido;
+  if (m) L.push('', 'FORMA DE COBRAR ELEGIDA', '- ' + m.tipo + ': ' + m.nombre + '. ' + m.como_funciona + ' Precio de referencia: ' + (m.precio_ejemplo||''));
+  const o = a.oferta;
+  if (o) L.push('', 'OFERTA', '- Qué vende: ' + o.nombre, '- Problema: ' + o.problema, '- Incluye: ' + (o.incluye||[]).join('; '), '- Precio: ' + (o.precio?.monto||''), '- Propuesta de valor: ' + o.propuesta);
+  if (a.ruta && d){ const mi = METAS[metaActualIdx()]; L.push('', 'META DE INGRESOS ACTUAL: ' + fmt(mi.meta) + ' al mes (fase: ' + mi.fase + '). Lleva ' + fmt(ingresosMes()) + ' este mes.'); }
+  const l = a.lanzamiento;
+  if (l.contactos || l.numVentas) L.push('', 'RESULTADOS HASTA HOY', `- Contactos: ${l.contactos}, respuestas: ${l.respuestas}, clientes: ${l.clientes}, ventas: ${l.numVentas} por ${l.ingresos}`);
+  return L.join('\n');
+}
+const REGLAS = `REGLAS
+- Usa SOLO los datos del proyecto de abajo. Todo debe ser específico para esta persona: menciona su oportunidad, sus habilidades y su cliente con sus propias palabras.
+- Nada de consejos genéricos ni teoría. Acciones concretas, frases cortas, español neutro, tutea.
+- Sé honesto y realista con su tiempo y presupuesto. No prometas ingresos.
+- Nunca propongas tácticas engañosas, escasez falsa, testimonios inventados ni presión.
+- Responde únicamente con JSON válido, sin texto adicional ni bloques de código.`;
+function armarPrompt(tarea, formato){ return `Eres un coach práctico de negocios digitales para emprendedores hispanohablantes.\n\n${REGLAS}\n\nPROYECTO\n${ctx()}\n\nTAREA\n${tarea}\n\nFORMATO JSON\n${formato}`; }
+
+/* =========================================================
+   ALMACENAMIENTO
+   ========================================================= */
+const Store = {
+  mode:'memory', db:null, uid:null, mem:null,
+  async init(){
+    const cl = window.claude;
+    if (cl && cl.use){
+      try{
+        const [db, user] = await Promise.all([cl.use('db'), cl.use('user')]);
+        const uid = user ? await user.id() : null;
+        if (db && uid){ this.db = db; this.uid = uid; this.mode = 'db'; return; }
+      }catch(e){}
+    }
+    try{ localStorage.setItem('__t','1'); localStorage.removeItem('__t'); this.mode = 'local'; }
+    catch(e){ this.mode = 'memory'; }
+  },
+  ref(){ return this.db.doc('data/users/' + this.uid + '/proyecto'); },
+  async load(){
+    try{
+      if (this.mode === 'db'){ const s = await this.ref().get(); return s.exists ? s.data() : null; }
+      if (this.mode === 'local'){ const r = localStorage.getItem('mi-proyecto'); return r ? JSON.parse(r) : null; }
+    }catch(e){}
+    return this.mem;
+  },
+  async save(p){
+    const copy = JSON.parse(JSON.stringify(p));
+    if (this.mode === 'db'){
+      try{ await this.ref().set(copy); return true; }
+      catch(e){ if (e && e.code === 'unavailable'){ await new Promise(r=>setTimeout(r,600+Math.random()*600)); try{ await this.ref().set(copy); return true; }catch(_){} } this.mode = 'local'; }
+    }
+    if (this.mode === 'local'){
+      try{ localStorage.setItem('mi-proyecto', JSON.stringify(copy)); return true; }catch(e){ this.mode = 'memory'; }
+    }
+    this.mem = copy; return true;
+  },
+  label(){
+    return { db:'Guardado en tu cuenta, visible solo para ti.', local:'Guardado en este dispositivo.', memory:'Guardado solo mientras esta página esté abierta.' }[this.mode];
+  }
+};
+
+/* =========================================================
+   ESTADO + UTILIDADES
+   ========================================================= */
+let proyecto = proyectoVacio();
+let sample = null;
+let analisisActual = null;
+let caminoSeleccionado = null;
+let ctl = null;
+let vista = 'diagnostico';
+const ui = { tabClientes:'canales', editando:null, sim:null, shark:null, ruta:null };
+
+const $ = s => document.querySelector(s);
+function el(tag, attrs = {}, ...kids){
+  const n = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs)){
+    if (k === 'class') n.className = v;
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+    else if (k === 'value') n.value = v;
+    else if (v !== false && v != null) n.setAttribute(k, v);
+  }
+  for (const k of kids.flat()){ if (k == null || k === false) continue; n.append(k instanceof Node ? k : String(k)); }
+  return n;
+}
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove('on'), 2600); }
+let _saveT = null;
+function persistir(inmediato){
+  proyecto.actualizado = new Date().toISOString();
+  clearTimeout(_saveT);
+  if (inmediato) return Store.save(proyecto);
+  _saveT = setTimeout(() => Store.save(proyecto), 500);
+}
+async function copiar(texto){
+  try{ await navigator.clipboard.writeText(texto); toast('Copiado'); return; }catch(e){}
+  const ta = el('textarea', {style:'position:fixed;opacity:0'}); ta.value = texto; document.body.append(ta); ta.select();
+  try{ document.execCommand('copy'); toast('Copiado'); }catch(e){ toast('No se pudo copiar. Selecciona el texto manualmente.'); }
+  ta.remove();
+}
+function confirmar(msg){
+  return new Promise(res => {
+    const d = $('#confirmDlg'); $('#confirmMsg').textContent = msg;
+    const fin = v => { d.close(); $('#confirmOk').onclick = $('#confirmNo').onclick = null; res(v); };
+    $('#confirmOk').onclick = () => fin(true); $('#confirmNo').onclick = () => fin(false);
+    d.oncancel = () => fin(false);
+    d.showModal();
+  });
+}
+const meter = (pct, cls='') => el('div', {class:'meter ' + cls}, el('i', {style:`width:${Math.max(0,Math.min(100,pct))}%`}));
+
+/* IA con estado de carga en el botón */
+async function conIA(btn, fn){
+  if (!sample){ toast('La IA no está disponible en esta vista.'); return null; }
+  const txt = btn ? btn.textContent : '';
+  if (btn){ btn.disabled = true; btn.classList.add('busy'); btn.textContent = 'Generando'; }
+  try{ return await fn(); }
+  catch(e){ toast(ERRORES[e && e.code] || 'No se pudo generar. Vuelve a intentarlo.'); return null; }
+  finally{ if (btn && btn.isConnected){ btn.disabled = false; btn.classList.remove('busy'); btn.textContent = txt; } }
+}
+async function iaJSON(tarea, formato, check){
+  const r = await sample.json(armarPrompt(tarea, formato), { modelTier:'default' });
+  if (check && !check(r)) throw { code:'invalid_json' };
+  return r;
+}
+
+/* =========================================================
+   NAVEGACIÓN
+   ========================================================= */
+function renderRail(){
+  const rail = $('#rail'); rail.replaceChildren();
+  AREAS.forEach(a => {
+    const done = hecho(a.id), ok = disponible(a);
+    rail.append(el('button', {type:'button', class:'stage' + (vista === a.id ? ' current' : '') + (done ? ' done' : ''),
+      'aria-current': vista === a.id ? 'page' : null, disabled: ok ? false : '',
+      title: ok ? a.nombre : 'Completa el paso anterior', onclick: () => ir(a.id) },
+      el('span', {class:'n'}, done ? '✓' : a.n),
+      el('span', {}, a.corto || a.nombre)
+    ));
+  });
+  $('#pct').textContent = progreso() + '%';
+  $('#openProject').classList.toggle('saved', hecho('diagnostico'));
+  $('#toolsWrap').hidden = !hecho('diagnostico');
+  const promo = $('#sharkPromo'); promo.replaceChildren();
+  if (hecho('diagnostico') && vista !== 'ruta'){
+    const mi = METAS[metaActualIdx()];
+    promo.append(el('button', {class:'shark-promo ruta-promo', type:'button', onclick:()=>ir('ruta')},
+      el('span', {class:'fin', 'aria-hidden':'true'}, '💰'),
+      el('span', {}, el('b', {}, 'Mi Ruta de Ingresos'), el('small', {}, `Meta actual: ${fmt(mi.meta)} al mes. Llevas ${fmt(ingresosMes())} este mes`)),
+      el('span', {class:'go'}, 'Ver plan')));
+  }
+  if (hecho('diagnostico') && vista !== 'shark'){
+    const r = rangoActual();
+    promo.append(el('button', {class:'shark-promo', type:'button', onclick:()=>ir('shark')},
+      el('span', {class:'fin', 'aria-hidden':'true'}, '🦈'),
+      el('span', {}, el('b', {}, 'Conviértete en un Shark de Ventas'), el('small', {}, `${r.em} ${r.nombre}, ${superados()} de 9 retos superados`)),
+      el('span', {class:'go'}, superados() ? 'Seguir' : 'Empezar')));
+  }
+}
+function ir(id, opts = {}){
+  const area = AREAS.find(a => a.id === id);
+  if (!disponible(area)){
+    if (area.req === 'diag'){ toast('Primero completa tu diagnóstico'); id = 'diagnostico'; }
+    else { toast('Primero elige tu oportunidad'); id = hecho('diagnostico') ? 'descubre' : 'diagnostico'; }
+  }
+  vista = id;
+  $('#v-diagnostico').classList.toggle('on', id === 'diagnostico');
+  $('#v-area').classList.toggle('on', id !== 'diagnostico');
+  renderRail();
+  if (id !== 'diagnostico') renderArea(opts);
+  window.scrollTo({top:0});
+}
+
+document.querySelectorAll('[data-tool]').forEach(b => b.addEventListener('click', () => {
+  const t = b.dataset.tool;
+  if (t === 'progreso') return abrirProyecto();
+  if (t === 'monetizar') ir('monetiza', {auto:true});
+  if (t === 'clientes'){ ui.tabClientes = 'canales'; ir('clientes', {auto:true}); }
+  if (t === 'oferta') ir('oferta', {auto:true});
+  if (t === 'practicar') ir('vende');
+  if (t === 'contenido'){ ui.tabClientes = 'contenido'; ir('clientes', {auto:true}); }
+}));
+
+function renderArea(opts = {}){
+  const root = $('#v-area'); root.replaceChildren();
+  const a = AREAS.find(x => x.id === vista);
+  if (a.id === 'shark'){ areaShark(root); return; }
+  if (a.id === 'ruta'){ areaRuta(root); return; }
+  root.append(el('div', {class:'area-head'},
+    el('div', {class:'kicker'}, el('b', {}, a.n), hecho(a.id) ? 'Completado' : 'Área ' + a.n + ' de 6'),
+    el('h2', {}, a.nombre), el('p', {}, a.lema)));
+  const body = el('div'); root.append(body);
+  ({ descubre:areaDescubre, monetiza:areaMonetiza, oferta:areaOferta, clientes:areaClientes, vende:areaVende, lanza:areaLanza })[vista](body, opts);
+}
+function ctxStrip(){
+  const op = proyecto.areas.oportunidad?.elegida;
+  if (!op) return null;
+  return el('div', {class:'ctx-strip'}, el('span', {}, 'Trabajando con: ', el('b', {}, op.nombre)), el('button', {class:'linkbtn', type:'button', onclick:()=>ir('descubre')}, 'Cambiar'));
+}
+function siguiente(id, texto){
+  return el('button', {class:'btn btn-primary', type:'button', style:'margin-top:18px', onclick:()=>ir(id)}, texto);
+}
+
+/* =========================================================
+   ÁREA 1 · DESCUBRE TU OPORTUNIDAD
+   ========================================================= */
+function areaDescubre(root){
+  const d = proyecto.etapas.diagnostico;
+  const op = proyecto.areas.oportunidad || { opciones: d.analisis?.caminos || [], elegida:null };
+  const opciones = op.opciones || [];
+  opciones.forEach(c => {
+    const elegida = op.elegida?.nombre === c.nombre;
+    root.append(el('article', {class:'path' + (elegida ? ' chosen' : ''), style:'margin-bottom:14px'},
+      el('div', {class:'letter', 'aria-hidden':'true'}, c.id),
+      el('div', {},
+        el('h3', {}, c.nombre), el('p', {class:'what'}, c.que_es),
+        el('div', {class:'meta'},
+          c.tipo_oferta ? el('span', {class:'tag'}, c.tipo_oferta) : null,
+          c.esfuerzo ? el('span', {class:'tag'}, 'Esfuerzo ' + String(c.esfuerzo).toLowerCase()) : null,
+          c.tiempo_primer_ingreso ? el('span', {class:'tag'}, 'Primer ingreso: ' + c.tiempo_primer_ingreso) : null),
+        el('dl', {}, el('dt', {}, 'Por qué tú'), el('dd', {}, c.por_que_tu || ''), el('dt', {}, 'Primer paso'), el('dd', {}, c.primer_paso || '')),
+        el('button', {class:'btn-sm' + (elegida ? ' gold' : ''), type:'button', onclick: () => {
+          proyecto.areas.oportunidad = { opciones, elegida: c }; persistir(true); toast('Oportunidad elegida'); renderRail(); renderArea();
+        }}, elegida ? '✓ Elegida' : 'Elegir esta oportunidad')
+      )));
+  });
+  root.append(el('div', {class:'btnrow', style:'margin-top:6px'},
+    el('button', {class:'btn-sm', type:'button', onclick: async e => {
+      const r = await conIA(e.currentTarget, () => iaJSON(
+        'Propón 3 oportunidades de negocio NUEVAS y distintas para esta persona, basadas en sus habilidades, experiencia y recursos. No repitas estas: ' + opciones.map(o=>o.nombre).join(' | '),
+        '{"oportunidades":[{"id":"A","nombre":"máx. 8 palabras","que_es":"1-2 frases","por_que_tu":"ligado a sus datos","tipo_oferta":"Servicio | Producto digital | App o herramienta | Híbrido","primer_paso":"acción de esta semana","tiempo_primer_ingreso":"estimación prudente","esfuerzo":"Bajo | Medio | Alto"}]} con exactamente 3 elementos, ids A, B, C.',
+        r => Array.isArray(r?.oportunidades) && r.oportunidades.length === 3));
+      if (r){ proyecto.areas.oportunidad = { opciones: r.oportunidades, elegida: op.elegida }; persistir(); renderArea(); }
+    }}, '🔄 Dame otras 3'),
+    el('button', {class:'btn-sm', type:'button', onclick:()=>ir('diagnostico')}, 'Revisar mi diagnóstico')));
+  if (op.elegida) root.append(siguiente('monetiza', 'Siguiente: Monetiza tu idea'));
+}
+
+/* =========================================================
+   ÁREA 2 · MONETIZA TU IDEA
+   ========================================================= */
+async function generarModelos(btn){
+  const r = await conIA(btn, () => iaJSON(
+    'Muestra de 4 a 5 formas reales y distintas de convertir la oportunidad elegida en ingresos (por ejemplo: servicio, producto físico, producto digital, app o herramienta, membresía, consultoría, taller en vivo, afiliados). Incluye SOLO las que tengan sentido para esta persona y ordénalas de mayor a menor encaje con su tiempo, presupuesto y habilidades.',
+    '{"modelos":[{"id":"m1","tipo":"Servicio | Producto | Producto digital | App | Membresía | Consultoría | Taller | Otro","nombre":"nombre concreto de lo que vendería","como_funciona":"1 frase","precio_ejemplo":"ej. 40 USD por sesión","ingreso_ejemplo":"ej. 8 clientes al mes = 320 USD","velocidad":"Rápida | Media | Lenta","dificultad":"Baja | Media | Alta","encaje":85,"por_que":"1 frase ligada a sus datos"}]}',
+    r => Array.isArray(r?.modelos) && r.modelos.length >= 3));
+  if (r){ proyecto.areas.monetizacion = { modelos: r.modelos, elegido: proyecto.areas.monetizacion?.elegido || null }; persistir(); renderArea(); }
+}
+function areaMonetiza(root, opts){
+  root.append(ctxStrip());
+  const m = proyecto.areas.monetizacion;
+  if (!m?.modelos){
+    const b = el('button', {class:'btn btn-primary big-cta', type:'button', onclick: e => generarModelos(e.currentTarget)}, 'Ver formas de monetizar mi oportunidad');
+    root.append(b);
+    if (opts.auto) generarModelos(b);
+    return;
+  }
+  m.modelos.forEach(x => {
+    const el2 = m.elegido?.nombre === x.nombre;
+    root.append(el('article', {class:'card' + (el2 ? ' pick' : '')},
+      el('div', {class:'model-top'},
+        el('div', {}, el('span', {class:'tag'}, x.tipo), el('h3', {style:'margin-top:8px'}, x.nombre)),
+        el('div', {class:'fit'}, (x.encaje ?? '') + '%', el('small', {}, 'encaje contigo'))),
+      el('p', {}, x.como_funciona),
+      el('div', {class:'meta', style:'display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px'},
+        el('span', {class:'tag'}, '💵 ' + (x.precio_ejemplo||'')),
+        el('span', {class:'tag'}, '⚡ ' + (x.velocidad||'') ), el('span', {class:'tag'}, 'Dificultad ' + String(x.dificultad||'').toLowerCase())),
+      el('p', {class:'small'}, 'Ejemplo: ' + (x.ingreso_ejemplo||'') + (x.por_que ? '. ' + x.por_que : '')),
+      el('button', {class:'btn-sm' + (el2 ? ' gold' : ''), type:'button', onclick: () => {
+        m.elegido = x; persistir(true); toast('Forma de cobrar elegida'); renderRail(); renderArea();
+      }}, el2 ? '✓ Elegida' : 'Elegir esta forma')
+    ));
+  });
+  root.append(el('div', {class:'btnrow'}, el('button', {class:'btn-sm', type:'button', onclick: e => generarModelos(e.currentTarget)}, '🔄 Dame otras opciones')));
+  if (m.elegido) root.append(siguiente('oferta', 'Siguiente: Crea tu oferta'));
+}
+
+/* =========================================================
+   ÁREA 3 · CREA TU OFERTA
+   ========================================================= */
+const OF_FORMATO = {
+  nombre:'"texto: nombre claro de lo que vende, máx. 10 palabras"',
+  problema:'"texto: el problema concreto de su cliente, 1-2 frases"',
+  incluye:'["3 a 5 elementos concretos que recibe el cliente"]',
+  precio:'{"monto":"ej. 49 USD","nota":"por qué ese precio para empezar, 1 frase"}',
+  propuesta:'"texto: 1 frase que diga qué resultado logra el cliente y por qué con esta persona"',
+};
+async function generarOferta(btn){
+  const r = await conIA(btn, () => iaJSON(
+    'Crea una oferta inicial lista para vender a partir de la oportunidad y la forma de cobrar elegidas. El precio debe ser prudente para conseguir los primeros clientes.',
+    `{"nombre":${OF_FORMATO.nombre},"problema":${OF_FORMATO.problema},"incluye":${OF_FORMATO.incluye},"precio":${OF_FORMATO.precio},"propuesta":${OF_FORMATO.propuesta}}`,
+    r => r && r.nombre && r.problema && Array.isArray(r.incluye) && r.precio?.monto && r.propuesta));
+  if (r){ proyecto.areas.oferta = { ...r, ok:{} }; persistir(); renderRail(); renderArea(); }
+}
+async function otraOpcion(k, btn){
+  const o = proyecto.areas.oferta;
+  const r = await conIA(btn, () => iaJSON(
+    `Da una alternativa DISTINTA para la parte "${OF_CAMPOS.find(c=>c.k===k).t}" de la oferta, coherente con el resto. Valor actual que no debes repetir: ${JSON.stringify(o[k])}`,
+    `{"valor":${OF_FORMATO[k]}}`, r => r && r.valor));
+  if (r){ o[k] = r.valor; o.ok[k] = false; persistir(); renderArea(); }
+}
+function valorCampo(o, k){
+  if (k === 'incluye') return el('ul', {class:'val'}, (o.incluye||[]).map(i => el('li', {}, i)));
+  if (k === 'precio') return el('div', {class:'val'}, el('div', {class:'fit', style:'text-align:left;font-size:1.8rem'}, o.precio?.monto || ''), el('div', {class:'small', style:'color:var(--muted);font-size:.9rem'}, o.precio?.nota || ''));
+  return el('p', {class:'val' + (k === 'nombre' ? ' title' : '')}, o[k] || '');
+}
+function editorCampo(o, k){
+  const val = k === 'incluye' ? (o.incluye||[]).join('\n') : k === 'precio' ? (o.precio?.monto || '') : (o[k] || '');
+  const inp = k === 'precio' ? el('input', {type:'text', value: val, 'aria-label':'Precio'}) : el('textarea', {'aria-label':'Editar'}, val);
+  const box = el('div', {},
+    k === 'incluye' ? el('p', {class:'help'}, 'Un elemento por línea.') : null,
+    inp,
+    el('div', {class:'btnrow', style:'margin-top:8px'},
+      el('button', {class:'btn-sm on', type:'button', onclick: () => {
+        const v = inp.value.trim(); if (!v) return;
+        if (k === 'incluye') o.incluye = v.split('\n').map(s=>s.trim()).filter(Boolean);
+        else if (k === 'precio') o.precio = { ...o.precio, monto: v, nota: 'Precio definido por ti.' };
+        else o[k] = v;
+        o.ok[k] = true; ui.editando = null; persistir(); renderRail(); renderArea();
+      }}, 'Guardar cambio'),
+      el('button', {class:'btn-sm', type:'button', onclick: () => { ui.editando = null; renderArea(); }}, 'Cancelar')));
+  setTimeout(() => inp.focus(), 0);
+  return box;
+}
+function textoOferta(o){
+  return `${o.nombre}\n\nPara quien: ${o.problema}\n\nIncluye:\n${(o.incluye||[]).map(i=>'• '+i).join('\n')}\n\nPrecio: ${o.precio?.monto}\n\n${o.propuesta}`;
+}
+function areaOferta(root, opts){
+  root.append(ctxStrip());
+  const o = proyecto.areas.oferta;
+  if (!o){
+    const b = el('button', {class:'btn btn-primary big-cta', type:'button', onclick: e => generarOferta(e.currentTarget)}, 'Crear mi oferta con IA');
+    root.append(b);
+    if (!proyecto.areas.monetizacion?.elegido) root.append(el('p', {class:'note', style:'margin-top:10px'}, 'Consejo: elige primero cómo vas a cobrar en ', el('button', {class:'linkbtn', type:'button', onclick:()=>ir('monetiza')}, 'Monetiza tu idea'), ' para una oferta más precisa.'));
+    if (opts.auto) generarOferta(b);
+    return;
+  }
+  o.ok = o.ok || {};
+  const n = OF_CAMPOS.filter(c => o.ok[c.k]).length;
+  root.append(el('div', {class:'meter-row', style:'margin-bottom:14px'}, meter(n/5*100), el('span', {}, n + ' de 5 aprobadas')));
+  OF_CAMPOS.forEach(c => {
+    const editing = ui.editando === c.k;
+    root.append(el('section', {class:'field' + (o.ok[c.k] ? ' ok' : '')},
+      el('div', {class:'field-head'}, el('h3', {}, c.t), o.ok[c.k] ? el('span', {class:'okb'}, '✓ Aprobado') : null),
+      editing ? editorCampo(o, c.k) : valorCampo(o, c.k),
+      editing ? null : el('div', {class:'btnrow'},
+        el('button', {class:'btn-sm' + (o.ok[c.k] ? ' on' : ''), type:'button', 'aria-pressed':String(!!o.ok[c.k]), onclick: () => { o.ok[c.k] = !o.ok[c.k]; persistir(); renderRail(); renderArea(); }}, '👍 Me gusta'),
+        el('button', {class:'btn-sm', type:'button', onclick: () => { ui.editando = c.k; renderArea(); }}, '✏️ Cambiar'),
+        el('button', {class:'btn-sm', type:'button', onclick: e => otraOpcion(c.k, e.currentTarget)}, '🔄 Dame otra opción'))
+    ));
+  });
+  if (ofertaLista(proyecto)){
+    root.append(el('div', {class:'offer-ready'},
+      el('h3', {}, 'Tu oferta está lista'),
+      el('p', {}, o.nombre + ' por ' + o.precio.monto + '.'),
+      el('div', {class:'btnrow'}, el('button', {class:'btn-sm', type:'button', onclick:()=>copiar(textoOferta(o))}, 'Copiar oferta'))));
+    root.append(siguiente('clientes', 'Siguiente: Consigue clientes'));
+  }
+  root.append(el('div', {class:'btnrow', style:'margin-top:14px'}, el('button', {class:'btn-sm', type:'button', onclick: async e => { const b = e.currentTarget; if (await confirmar('¿Crear una oferta nueva desde cero? Se reemplaza la actual.')) generarOferta(b); }}, 'Crear otra oferta completa')));
+}
+
+/* =========================================================
+   ÁREA 4 · CONSIGUE CLIENTES
+   ========================================================= */
+const CL_TABS = [
+  { id:'canales', t:'🎯 Dónde buscar' }, { id:'mensajes', t:'💬 Mensajes' },
+  { id:'contenido', t:'📣 Contenido' }, { id:'plan', t:'✅ Plan de hoy' },
+];
+const CL_GEN = {
+  canales:{ btn:'Dime dónde buscar mis clientes',
+    tarea:'Indica los 4 lugares concretos (online u offline) donde esta persona tiene más probabilidad de encontrar a sus primeros clientes, según su oferta y su cliente. Sé específico: tipo de grupo, comunidad, plataforma o lugar físico.',
+    formato:'{"canales":[{"nombre":"lugar concreto","por_que":"1 frase","accion_hoy":"acción concreta de hoy, 1 frase","dificultad":"Baja | Media | Alta"}]}',
+    ok:r => Array.isArray(r?.canales) && r.canales.length, key:'canales' },
+  mensajes:{ btn:'Escribir mis mensajes para contactar clientes',
+    tarea:'Escribe 3 mensajes listos para enviar para conseguir clientes: uno a alguien que no te conoce, uno a alguien que ya te conoce y uno de seguimiento. Deben ser cortos, humanos, sin presión, centrados en el problema del cliente y con una pregunta sencilla al final.',
+    formato:'{"mensajes":[{"tipo":"A alguien que no te conoce | A alguien que te conoce | Seguimiento","canal":"WhatsApp, Instagram, correo, etc.","texto":"el mensaje completo"}]}',
+    ok:r => Array.isArray(r?.mensajes) && r.mensajes.length, key:'mensajes' },
+  contenido:{ btn:'Crear contenido para vender',
+    tarea:'Crea 3 piezas de contenido para vender la oferta en redes, en formatos distintos (por ejemplo: post, historia, video corto). Cada una con un gancho fuerte, un texto breve listo para publicar y una llamada a la acción honesta.',
+    formato:'{"piezas":[{"formato":"Post | Historia | Video corto | Carrusel","gancho":"primera frase","texto":"texto listo para publicar, máx. 80 palabras","cta":"llamada a la acción"}]}',
+    ok:r => Array.isArray(r?.piezas) && r.piezas.length, key:'contenido', from:'piezas' },
+  plan:{ btn:'Crear mi plan para hoy',
+    tarea:'Crea un plan de acción para HOY de 4 a 5 tareas concretas para conseguir clientes, que quepan en el tiempo que tiene esta persona. Ordenadas de la más importante a la menos.',
+    formato:'{"tareas":[{"texto":"acción concreta","minutos":20}]}',
+    ok:r => Array.isArray(r?.tareas) && r.tareas.length, key:'plan', from:'tareas' },
+};
+async function generarClientes(tab, btn){
+  const g = CL_GEN[tab];
+  const r = await conIA(btn, () => iaJSON(g.tarea, g.formato, g.ok));
+  if (!r) return;
+  let v = r[g.from || g.key];
+  if (tab === 'plan') v = v.map(t => ({ ...t, hecho:false }));
+  proyecto.areas.clientes[g.key] = v; persistir(); renderRail(); renderArea();
+}
+async function regenerarUno(tab, i, btn){
+  const c = proyecto.areas.clientes;
+  const actual = c[tab][i];
+  const formato = tab === 'mensajes' ? '{"item":{"tipo":"","canal":"","texto":""}}' : '{"item":{"formato":"","gancho":"","texto":"","cta":""}}';
+  const r = await conIA(btn, () => iaJSON(
+    `Escribe una versión distinta de esta ${tab === 'mensajes' ? 'mensaje de contacto' : 'pieza de contenido'}, mismo tipo y objetivo, con otro enfoque. Actual: ${JSON.stringify(actual)}`,
+    formato, r => r?.item?.texto));
+  if (r){ c[tab][i] = r.item; persistir(); renderArea(); }
+}
+function areaClientes(root, opts){
+  root.append(ctxStrip());
+  const c = proyecto.areas.clientes;
+  const tabs = el('div', {class:'tabs', role:'tablist'});
+  CL_TABS.forEach(t => tabs.append(el('button', {class:'btn-sm' + (ui.tabClientes === t.id ? ' on' : ''), role:'tab', 'aria-selected':String(ui.tabClientes === t.id), type:'button', onclick: () => { ui.tabClientes = t.id; renderArea(); }}, t.t)));
+  root.append(tabs);
+  const tab = ui.tabClientes, g = CL_GEN[tab], data = c[g.key];
+  if (!data){
+    const b = el('button', {class:'btn btn-primary big-cta', type:'button', onclick: e => generarClientes(tab, e.currentTarget)}, g.btn);
+    root.append(b);
+    if (opts.auto) generarClientes(tab, b);
+    return;
+  }
+  if (tab === 'canales') data.forEach(x => root.append(el('article', {class:'card'},
+    el('h3', {}, x.nombre), el('p', {}, x.por_que),
+    el('p', {}, el('b', {}, 'Hoy: '), x.accion_hoy),
+    el('div', {class:'btnrow'},
+      el('span', {class:'tag'}, 'Dificultad ' + String(x.dificultad||'').toLowerCase()),
+      el('button', {class:'btn-sm', type:'button', onclick: () => {
+        c.plan = c.plan || []; c.plan.push({ texto: x.accion_hoy, minutos: null, hecho:false }); persistir(); toast('Agregado a tu plan de hoy');
+      }}, '＋ Agregar a mi plan de hoy')))));
+  if (tab === 'mensajes') data.forEach((x, i) => root.append(el('article', {class:'card'},
+    el('div', {class:'btnrow'}, el('span', {class:'tag'}, x.tipo), el('span', {class:'tag'}, x.canal)),
+    el('div', {class:'msgbox'}, x.texto),
+    el('div', {class:'btnrow'},
+      el('button', {class:'btn-sm', type:'button', onclick:()=>copiar(x.texto)}, 'Copiar'),
+      el('button', {class:'btn-sm gold', type:'button', onclick:()=>{ proyecto.areas.lanzamiento.contactos++; persistir(); renderRail(); toast('+1 contacto en tu tablero'); }}, '📤 Lo envié'),
+      el('button', {class:'btn-sm', type:'button', onclick: e => regenerarUno('mensajes', i, e.currentTarget)}, '🔄 Otra versión')))));
+  if (tab === 'contenido') data.forEach((x, i) => root.append(el('article', {class:'card'},
+    el('span', {class:'tag'}, x.formato),
+    el('h3', {style:'margin-top:10px'}, x.gancho),
+    el('div', {class:'msgbox'}, x.texto + (x.cta ? '\n\n' + x.cta : '')),
+    el('div', {class:'btnrow'},
+      el('button', {class:'btn-sm', type:'button', onclick:()=>copiar(x.gancho + '\n\n' + x.texto + (x.cta ? '\n\n' + x.cta : ''))}, 'Copiar'),
+      el('button', {class:'btn-sm', type:'button', onclick: e => regenerarUno('contenido', i, e.currentTarget)}, '🔄 Otra idea')))));
+  if (tab === 'plan'){
+    const hechos = data.filter(t => t.hecho).length;
+    root.append(el('div', {class:'meter-row', style:'margin-bottom:8px'}, meter(data.length ? hechos/data.length*100 : 0, 'gold'), el('span', {}, hechos + ' de ' + data.length)));
+    const ul = el('ul', {class:'checks card'});
+    data.forEach((t, i) => {
+      const id = 'pl' + i;
+      ul.append(el('li', {class: t.hecho ? 'done' : ''},
+        el('input', {type:'checkbox', id, checked: t.hecho ? '' : false, onchange: e => { t.hecho = e.target.checked; persistir(); renderRail(); renderArea(); if (t.hecho) toast('¡Hecho!'); }}),
+        el('label', {for:id}, t.texto), t.minutos ? el('span', {class:'mins'}, t.minutos + ' min') : null));
+    });
+    root.append(ul);
+  }
+  root.append(el('div', {class:'btnrow', style:'margin-top:6px'},
+    el('button', {class:'btn-sm', type:'button', onclick: e => generarClientes(tab, e.currentTarget)}, tab === 'plan' ? '🔄 Nuevo plan' : '🔄 Generar de nuevo')));
+}
+
+/* =========================================================
+   ÁREA 5 · VENDE SIN MIEDO (simulador)
+   ========================================================= */
+const ESCENARIOS = [
+  { id:'caro', t:'"Está muy caro"', d:'Le interesa pero duda del precio.' },
+  { id:'pensar', t:'"Lo voy a pensar"', d:'No dice que no, pero no decide.' },
+  { id:'incluye', t:'"¿Qué incluye?"', d:'Quiere entender bien antes de pagar.' },
+  { id:'porque', t:'"¿Por qué contigo?"', d:'Compara con otras opciones.' },
+  { id:'desconfia', t:'"Ya probé algo así y no funcionó"', d:'Viene con desconfianza.' },
+  { id:'azar', t:'Cliente sorpresa', d:'La IA elige la situación.' },
+];
+function instruccionesCliente(esc){
+  return `Vas a hacer un juego de rol para que un emprendedor practique ventas. TÚ eres un cliente potencial realista (no el vendedor).
+
+Lo que vende el emprendedor:
+${ctx()}
+
+Situación a practicar: ${esc.id === 'azar' ? 'elige tú una objeción común y realista para esta oferta' : esc.t + ' (' + esc.d + ')'}.
+
+Cómo actuar:
+- Habla como una persona real, en español neutro, 1 a 3 frases por mensaje. Solo tu mensaje, sin narrar ni poner tu nombre.
+- Si el vendedor responde con claridad, empatía y honestidad, puedes avanzar: hacer otra pregunta, pedir detalles o acercarte a comprar.
+- Si presiona, exagera, promete de más o no responde tu duda, te enfrías.
+- No te rindas enseguida ni seas imposible. Nunca rompas el personaje.
+
+Escribe ahora tu primer mensaje al vendedor.`;
+}
+function turnosSim(){
+  const s = ui.sim, t = [{ role:'user', content: instruccionesCliente(s.esc) }];
+  s.msgs.forEach(m => t.push(m.de === 'cli' ? { role:'assistant', content:m.texto } : { role:'user', content:'El vendedor responde: ' + m.texto }));
+  return t;
+}
+async function turnoCliente(){
+  const s = ui.sim; s.esperando = true;
+  const m = { de:'cli', texto:'…' }; s.msgs.push(m); renderArea();
+  const bubble = document.querySelector('.chat .bubble.cli:last-of-type .txt');
+  try{
+    const turnos = turnosSim().slice(0, -1);
+    const r = await sample(turnos, { modelTier:'quick', cache:false, onText: ({text}) => { m.texto = text; const b = document.querySelectorAll('.chat .bubble.cli .txt'); if (b.length) b[b.length-1].textContent = text; } });
+    m.texto = r.text.trim();
+  }catch(e){
+    s.msgs.pop(); toast(ERRORES[e && e.code] || 'El cliente no respondió. Vuelve a intentarlo.');
+  }
+  s.esperando = false; renderArea();
+  const ta = document.querySelector('.composer textarea'); if (ta) ta.focus();
+}
+async function pedirFeedback(btn){
+  const s = ui.sim;
+  const transcript = s.msgs.map(m => (m.de === 'cli' ? 'CLIENTE: ' : 'VENDEDOR: ') + m.texto).join('\n');
+  const r = await conIA(btn, () => iaJSON(
+    `Evalúa cómo respondió el VENDEDOR en esta práctica de venta (situación: ${s.esc.t}). Valora claridad, empatía, honestidad, si respondió la duda real y si propuso un siguiente paso sin presionar. Penaliza cualquier táctica de presión, urgencia falsa o promesa exagerada.\n\nCONVERSACIÓN\n${transcript}`,
+    '{"puntaje":7,"bien":["1-2 cosas concretas que hizo bien"],"mejorar":["1-2 cosas concretas a mejorar"],"respuesta_sugerida":"cómo podría responder mejor a la objeción principal, en sus palabras, honesto y sin presión","alerta":"si usó presión o engaño, explícalo en 1 frase; si no, cadena vacía"}',
+    r => typeof r?.puntaje === 'number'));
+  if (r){
+    s.feedback = r;
+    proyecto.areas.ventas.practicas.push({ escenario: s.esc.t, puntaje: r.puntaje, fecha: new Date().toISOString() });
+    persistir(); renderRail(); renderArea();
+  }
+}
+function areaVende(root){
+  root.append(ctxStrip());
+  const s = ui.sim, pr = proyecto.areas.ventas.practicas;
+  if (!s){
+    if (!proyecto.areas.oferta) root.append(el('p', {class:'note', style:'margin-bottom:12px'}, 'Funciona mejor con tu oferta creada. ', el('button', {class:'linkbtn', type:'button', onclick:()=>ir('oferta')}, 'Crear mi oferta')));
+    root.append(el('p', {class:'sec-title', style:'margin-top:0'}, 'Elige qué quieres practicar'));
+    const g = el('div', {class:'scen'});
+    ESCENARIOS.forEach(esc => g.append(el('button', {type:'button', onclick: () => {
+      if (!sample){ toast('La IA no está disponible en esta vista.'); return; }
+      ui.sim = { esc, msgs:[], feedback:null, esperando:false }; turnoCliente();
+    }}, esc.t, el('small', {}, esc.d))));
+    root.append(g);
+    if (pr.length){
+      const ult = pr.slice(-10);
+      root.append(el('div', {class:'card'},
+        el('div', {class:'model-top'}, el('h3', {}, 'Tus prácticas'), el('div', {class:'fit'}, pr[pr.length-1].puntaje + '/10', el('small', {}, 'última'))),
+        el('div', {class:'hist', 'aria-label':'Puntajes recientes'}, ult.map(p => el('i', {style:`height:${p.puntaje*10}%`, title: p.escenario + ': ' + p.puntaje}))),
+        el('p', {class:'small', style:'margin-top:8px'}, pr.length + (pr.length === 1 ? ' práctica' : ' prácticas') + ' en total')));
+    }
+    return;
+  }
+  root.append(el('div', {class:'btnrow', style:'margin-bottom:10px'}, el('span', {class:'tag'}, 'Practicando: ' + s.esc.t)));
+  const chat = el('div', {class:'chat', 'aria-live':'polite'});
+  s.msgs.forEach(m => chat.append(el('div', {class:'bubble ' + m.de}, el('span', {class:'who'}, m.de === 'cli' ? 'Cliente' : 'Tú'), el('span', {class:'txt'}, m.texto))));
+  root.append(chat);
+  if (!s.feedback){
+    const ta = el('textarea', {placeholder:'Escribe tu respuesta como vendedor…', 'aria-label':'Tu respuesta'});
+    const send = el('button', {class:'btn btn-primary', type:'button', style:'width:auto', disabled: s.esperando ? '' : false, onclick: () => {
+      const v = ta.value.trim(); if (!v || s.esperando) return;
+      s.msgs.push({ de:'yo', texto:v }); turnoCliente();
+    }}, 'Responder');
+    ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); send.click(); } });
+    root.append(el('div', {class:'composer'}, ta, send));
+    const misResp = s.msgs.filter(m => m.de === 'yo').length;
+    root.append(el('div', {class:'btnrow', style:'margin-top:12px'},
+      el('button', {class:'btn-sm gold', type:'button', disabled: misResp ? false : '', onclick: e => pedirFeedback(e.currentTarget)}, '📊 Terminar y ver mi feedback'),
+      el('button', {class:'btn-sm', type:'button', onclick: () => { ui.sim = null; renderArea(); }}, 'Salir')));
+    if (misResp >= 4) root.append(el('p', {class:'note', style:'margin-top:8px'}, 'Buen momento para pedir tu feedback.'));
+  } else {
+    const f = s.feedback;
+    root.append(el('div', {class:'card', style:'margin-top:16px'},
+      el('div', {class:'score'}, el('div', {class:'num'}, f.puntaje, el('small', {}, '/10')), el('div', {style:'flex:1'}, meter(f.puntaje*10))),
+      f.alerta ? el('div', {class:'alert'}, '⚠️ ' + f.alerta) : null,
+      el('p', {}, el('b', {}, 'Lo hiciste bien')), el('ul', {}, (f.bien||[]).map(x => el('li', {}, x))),
+      el('p', {}, el('b', {}, 'Para mejorar')), el('ul', {}, (f.mejorar||[]).map(x => el('li', {}, x))),
+      el('p', {}, el('b', {}, 'Una respuesta más fuerte')), el('div', {class:'msgbox'}, f.respuesta_sugerida || ''),
+      el('div', {class:'btnrow'},
+        el('button', {class:'btn-sm on', type:'button', onclick: () => { const esc = s.esc; ui.sim = { esc, msgs:[], feedback:null, esperando:false }; turnoCliente(); }}, '🔁 Repetir esta situación'),
+        el('button', {class:'btn-sm', type:'button', onclick: () => { ui.sim = null; renderArea(); }}, 'Practicar otra'))));
+  }
+}
+
+/* =========================================================
+   ÁREA 6 · LANZA Y MIDE
+   ========================================================= */
+function areaLanza(root){
+  const L = proyecto.areas.lanzamiento;
+  const items = [...CHECK_BASE, ...L.extra];
+  const esHecho = it => (it.auto ? it.auto(proyecto) : false) || !!L.hechos[it.id];
+  const n = items.filter(esHecho).length;
+
+  root.append(el('p', {class:'sec-title', style:'margin-top:0'}, 'Checklist de lanzamiento'));
+  root.append(el('div', {class:'meter-row', style:'margin-bottom:8px'}, meter(n/items.length*100), el('span', {}, n + ' de ' + items.length)));
+  const ul = el('ul', {class:'checks card'});
+  items.forEach(it => {
+    const auto = it.auto && it.auto(proyecto), id = 'ck_' + it.id;
+    ul.append(el('li', {class: esHecho(it) ? 'done' : ''},
+      el('input', {type:'checkbox', id, checked: esHecho(it) ? '' : false, disabled: auto ? '' : false, onchange: e => { L.hechos[it.id] = e.target.checked; persistir(); renderArea(); }}),
+      el('label', {for:id}, it.texto), auto ? el('span', {class:'auto'}, 'auto') : null));
+  });
+  root.append(ul);
+  const addInp = el('input', {type:'text', placeholder:'Agregar una tarea propia', 'aria-label':'Nueva tarea'});
+  const add = () => { const v = addInp.value.trim(); if (!v) return; L.extra.push({ id:'x' + Date.now(), texto:v }); persistir(); renderArea(); };
+  addInp.addEventListener('keydown', e => { if (e.key === 'Enter') add(); });
+  root.append(el('div', {class:'addrow'}, addInp, el('button', {class:'btn-sm', type:'button', onclick:add}, 'Agregar')));
+
+  root.append(el('p', {class:'sec-title'}, 'Tu tablero'));
+  const cnt = (k, t) => el('div', {class:'counter'},
+    el('div', {class:'lbl'}, t), el('div', {class:'num'}, L[k]),
+    el('div', {class:'pm'},
+      el('button', {type:'button', 'aria-label':'Restar ' + t, onclick:()=>{ L[k] = Math.max(0, L[k]-1); persistir(); renderRail(); renderArea(); }}, '−'),
+      el('button', {type:'button', 'aria-label':'Sumar ' + t, onclick:()=>{ L[k]++; persistir(); renderRail(); renderArea(); }}, '+')));
+  const monto = el('input', {type:'text', inputmode:'decimal', placeholder:'Monto', 'aria-label':'Monto de la venta'});
+  const regVenta = () => {
+    const v = parseFloat(String(monto.value).replace(',', '.'));
+    if (!(v > 0)){ toast('Escribe el monto de la venta'); return; }
+    registrarVenta(v);
+  };
+  monto.addEventListener('keydown', e => { if (e.key === 'Enter') regVenta(); });
+  root.append(el('div', {class:'counters'},
+    cnt('contactos', 'Contactos'), cnt('respuestas', 'Respuestas'), cnt('clientes', 'Clientes'),
+    el('div', {class:'counter money'}, el('div', {class:'lbl'}, 'Ventas'),
+      el('div', {class:'num'}, L.ingresos.toLocaleString('es')),
+      el('div', {class:'lbl', style:'font-weight:400'}, L.numVentas + (L.numVentas === 1 ? ' venta' : ' ventas')),
+      el('div', {class:'sale-row'}, monto, el('button', {class:'btn-sm gold', type:'button', onclick:regVenta, 'aria-label':'Registrar venta'}, '+')))));
+
+  const max = Math.max(L.contactos, 1);
+  const fila = (t, v) => el('div', {class:'fr'}, el('span', {}, t), el('div', {class:'bar'}, el('i', {style:`width:${v/max*100}%`})), el('b', {}, v));
+  root.append(el('div', {class:'card'},
+    el('div', {class:'funnel'}, fila('Contactos', L.contactos), fila('Respuestas', L.respuestas), fila('Clientes', L.clientes), fila('Ventas', L.numVentas)),
+    el('div', {class:'rates'},
+      el('span', {}, 'Tasa de respuesta ', el('b', {}, L.contactos ? Math.round(L.respuestas/L.contactos*100) + '%' : '—')),
+      el('span', {}, 'Tasa de cierre ', el('b', {}, L.respuestas ? Math.round(L.clientes/L.respuestas*100) + '%' : '—')))));
+
+  root.append(el('div', {class:'btnrow'}, el('button', {class:'btn-sm on', type:'button', onclick: async e => {
+    if (!L.contactos){ toast('Registra al menos un contacto para analizar'); return; }
+    const r = await conIA(e.currentTarget, () => iaJSON(
+      `Lee sus números de lanzamiento y dile qué está funcionando y qué hacer ahora. Checklist: ${n} de ${items.length} tareas hechas.`,
+      '{"lectura":"1-2 frases honestas sobre sus números","acciones":["3 acciones concretas para los próximos días"]}',
+      r => r?.lectura && Array.isArray(r.acciones)));
+    if (r){ L.lectura = r; persistir(); renderArea(); }
+  }}, '📈 Analizar mis números')));
+  if (L.lectura) root.append(el('div', {class:'card', style:'margin-top:12px'},
+    el('p', {}, L.lectura.lectura), el('ul', {class:'checks'}, L.lectura.acciones.map((a, i) => el('li', {}, el('span', {class:'n', style:'font-family:var(--display);font-weight:700;color:var(--deep)'}, i+1), el('span', {}, a))))));
+}
+const Q4 = {
+  cero:{ l:'¿Qué temas, problemas o tipo de personas te interesan?', h:'Aunque sea una intuición. Ejemplo: "me interesan las mamás que quieren volver a trabajar" o "me gusta la cocina saludable".' },
+  idea:{ l:'Cuéntame tu idea', h:'Qué es, para quién sería y por qué se te ocurrió.' },
+  existente:{ l:'¿Qué tienes hoy y qué pasa cuando intentas venderlo?', h:'Qué vendes, a qué precio, cómo lo promocionas y qué respuesta recibes.' },
+};
+const respuestas = { puntoPartida:'', habilidades:'', experiencia:'', ideaActual:'', objetivoTipo:'', meta:'', tiempo:'', presupuesto:'' };
+
+function setChip(group, value){
+  group.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-checked', String(c.dataset.value === value)));
+  respuestas[group.dataset.field] = value;
+  if (group.dataset.field === 'puntoPartida') updateQ4();
+}
+function updateQ4(){
+  const c = Q4[respuestas.puntoPartida];
+  if (!c) return;
+  $('#q4l').textContent = c.l; $('#q4h').textContent = c.h;
+}
+document.querySelectorAll('.chips').forEach(g => {
+  g.addEventListener('click', e => { const b = e.target.closest('.chip'); if (b) setChip(g, b.dataset.value); });
+  g.addEventListener('keydown', e => {
+    if (!['ArrowRight','ArrowLeft','ArrowDown','ArrowUp'].includes(e.key)) return;
+    const cs = [...g.querySelectorAll('.chip')]; const i = cs.indexOf(document.activeElement); if (i < 0) return;
+    e.preventDefault(); const d = (e.key==='ArrowRight'||e.key==='ArrowDown') ? 1 : -1;
+    const nx = cs[(i + d + cs.length) % cs.length]; nx.focus(); setChip(g, nx.dataset.value);
+  });
+});
+document.querySelectorAll('textarea[data-field], input[data-field], select[data-field]').forEach(inp => {
+  inp.addEventListener('input', () => { respuestas[inp.dataset.field] = inp.value.trim(); inp.closest('.q').classList.remove('missing'); });
+});
+
+function fillForm(r){
+  Object.assign(respuestas, r);
+  document.querySelectorAll('.chips').forEach(g => setChip(g, r[g.dataset.field] || ''));
+  document.querySelectorAll('textarea[data-field], input[data-field], select[data-field]').forEach(i => { i.value = r[i.dataset.field] || ''; });
+  updateQ4();
+}
+
+function validar(){
+  const req = [['puntoPartida','q1'],['habilidades','q2'],['ideaActual','q4'],['objetivoTipo','q5']];
+  const faltan = req.filter(([f]) => !respuestas[f]);
+  document.querySelectorAll('.q').forEach(q => q.classList.remove('missing'));
+  faltan.forEach(([,id]) => $('#'+id).classList.add('missing'));
+  if (faltan.length){
+    const nums = faltan.map(([,id]) => id.slice(1)).join(', ');
+    $('#formNote').textContent = 'Completa ' + (faltan.length > 1 ? 'las preguntas ' : 'la pregunta ') + nums + ' para analizar.';
+    $('#formNote').classList.add('err');
+    $('#' + faltan[0][1]).scrollIntoView({block:'center'});
+    return false;
+  }
+  $('#formNote').textContent = ''; $('#formNote').classList.remove('err');
+  return true;
+}
+
+/* =========================================================
+   ANÁLISIS CON IA
+   ========================================================= */
+const PARTIDA = { cero:'Empieza desde cero (sin idea ni negocio)', idea:'Tiene una idea sin lanzar', existente:'Ya tiene algo pero no logra venderlo' };
+
+function construirPrompt(r){
+  return `Eres un estratega de negocios digitales que ayuda a personas hispanohablantes a convertir lo que saben en una oferta que se pueda vender. Esta es la Etapa 1 (Diagnóstico) de un proceso de 5 etapas: Diagnóstico, Problema + Solución, Cliente ideal, Oferta, Venta + Monetización.
+
+REGLAS ESTRICTAS
+- Trabaja SOLO con los datos de esta persona. Cada afirmación debe poder rastrearse a algo que escribió. Menciona sus habilidades, experiencia e idea con sus propias palabras.
+- Prohibido el consejo genérico ("crea contenido de valor", "usa redes sociales", "encuentra tu nicho") si no está aterrizado en su caso concreto.
+- Los 3 caminos deben ser realmente distintos entre sí (por ejemplo: vender un servicio con lo que ya sabe, empaquetarlo en un producto digital, o reposicionar/validar lo que ya tiene), y todos deben ser posibles con su tiempo y presupuesto.
+- Sé honesto: si su meta no es realista con su tiempo, dilo con respeto. No prometas ingresos garantizados; da tiempos estimados prudentes.
+- Si falta información importante, dilo en "obstaculo_principal" o "dato_faltante" en lugar de inventar.
+- Escribe en español neutro, cercano, frases cortas. Tutea.
+
+DATOS DE LA PERSONA
+- Punto de partida: ${PARTIDA[r.puntoPartida]}
+- Habilidades: ${r.habilidades || '(sin respuesta)'}
+- Experiencia / en qué le piden ayuda: ${r.experiencia || '(sin respuesta)'}
+- ${Q4[r.puntoPartida].l}: ${r.ideaActual || '(sin respuesta)'}
+- Objetivo: ${r.objetivoTipo}${r.meta ? ' — meta: ' + r.meta : ''}
+- Tiempo por semana: ${r.tiempo || '(no indicó)'}
+- Dinero para invertir: ${r.presupuesto || '(no indicó)'}
+
+FORMATO
+Responde únicamente con JSON válido, sin texto adicional ni bloques de código, con esta forma exacta:
+{
+  "resumen": "2 o 3 frases que describen su situación real usando sus datos",
+  "fortalezas": ["3 fortalezas concretas sacadas de sus respuestas"],
+  "obstaculo_principal": "el principal freno hoy, en 1 o 2 frases",
+  "activo_oculto": "algo valioso que tiene y quizá no ve, en 1 o 2 frases",
+  "dato_faltante": "qué información le convendría aclarar en la siguiente etapa, o cadena vacía",
+  "caminos": [
+    {
+      "id": "A",
+      "nombre": "nombre corto y concreto del camino (máx. 8 palabras)",
+      "que_es": "qué haría exactamente, en 1 o 2 frases",
+      "por_que_tu": "por qué encaja con sus habilidades/experiencia específicas",
+      "tipo_oferta": "Servicio | Producto digital | App o herramienta | Híbrido",
+      "primer_paso": "una acción concreta que puede hacer esta semana",
+      "tiempo_primer_ingreso": "estimación prudente, ej. '3 a 6 semanas'",
+      "esfuerzo": "Bajo | Medio | Alto",
+      "riesgo": "el riesgo principal de este camino en 1 frase"
+    }
+  ],
+  "recomendado": "A, B o C",
+  "razon_recomendacion": "por qué ese camino es el mejor punto de partida para esta persona, en 1 o 2 frases"
+}
+"caminos" debe tener exactamente 3 elementos con id "A", "B" y "C".`;
+}
+
+function validarAnalisis(a){
+  return a && typeof a.resumen === 'string' && Array.isArray(a.caminos) && a.caminos.length === 3 && a.caminos.every(c => c && c.nombre && c.que_es);
+}
+
+const ERRORES = {
+  not_granted:'Necesitas un código de acceso válido para usar la IA.',
+  offline:'Necesitas conexión a internet para usar la IA. Lo demás funciona sin conexión.',
+  sampling_disabled:'La IA aún no está configurada en el servidor.',
+  rate_limited:'Demasiadas solicitudes seguidas. Espera un minuto y vuelve a intentarlo.',
+  invalid_json:'La respuesta llegó incompleta. Vuelve a intentarlo.',
+  empty_completion:'La respuesta llegó vacía. Vuelve a intentarlo.',
+  refused:'No se pudo analizar con estas respuestas. Revisa el texto y vuelve a intentarlo.',
+  session_expired:'Tu sesión expiró. Recarga la página e inténtalo de nuevo.',
+  prompt_too_large:'Tus respuestas son demasiado largas. Resume un poco y vuelve a intentarlo.',
+};
+const MENSAJES = ['Leyendo tus respuestas','Cruzando tus habilidades con oportunidades reales','Revisando qué es posible con tu tiempo y presupuesto','Armando tus 3 caminos'];
+
+async function analizar(){
+  if (!validar()) return;
+  if (!sample){ $('#formNote').textContent = 'El análisis con IA no está disponible en esta vista.'; $('#formNote').classList.add('err'); return; }
+  const btn = $('#analyze'); btn.disabled = true;
+  const th = $('#thinking'); th.classList.add('on');
+  let i = 0; $('#thinkingMsg').textContent = MENSAJES[0];
+  const tick = setInterval(() => { i = Math.min(i+1, MENSAJES.length-1); $('#thinkingMsg').textContent = MENSAJES[i]; }, 6000);
+  th.scrollIntoView({block:'center'});
+  ctl = new AbortController();
+  try{
+    const res = await sample.json(construirPrompt(respuestas), { signal: ctl.signal, modelTier:'default' });
+    if (!validarAnalisis(res)) throw { code:'invalid_json' };
+    analisisActual = res;
+    caminoSeleccionado = null;
+    renderResultado(true);
+  }catch(e){
+    if (e && e.code === 'cancelled'){ $('#formNote').textContent = 'Análisis detenido.'; $('#formNote').classList.remove('err'); }
+    else { $('#formNote').textContent = ERRORES[e && e.code] || 'No se pudo completar el análisis. Vuelve a intentarlo.'; $('#formNote').classList.add('err'); }
+  }finally{
+    clearInterval(tick); th.classList.remove('on'); btn.disabled = false; ctl = null;
+  }
+}
+$('#analyze').addEventListener('click', analizar);
+$('#stop').addEventListener('click', () => ctl && ctl.abort());
+
+/* =========================================================
+   RESULTADO
+   ========================================================= */
+function renderResultado(scroll){
+  const a = analisisActual; if (!a) return;
+  const R = $('#result'); R.replaceChildren(); R.classList.add('on');
+
+  R.append(
+    el('span', {class:'start-tag'}, PARTIDA[respuestas.puntoPartida] || ''),
+    el('h2', {}, 'Tu diagnóstico'),
+    el('p', {class:'summary'}, a.resumen),
+    el('div', {class:'facts'},
+      el('div', {class:'fact'}, el('h3', {}, 'Tus fortalezas'), el('ul', {}, (a.fortalezas||[]).map(f => el('li', {}, f)))),
+      el('div', {class:'fact'}, el('h3', {}, 'Lo que te frena'), el('p', {}, a.obstaculo_principal || '')),
+      el('div', {class:'fact'}, el('h3', {}, 'Lo que tienes y quizá no ves'), el('p', {}, a.activo_oculto || ''))
+    )
+  );
+  if (a.dato_faltante) R.append(el('p', {class:'note', style:'margin:-22px 0 34px'}, 'Para la siguiente etapa conviene aclarar: ' + a.dato_faltante));
+
+  R.append(el('div', {class:'paths-head'}, el('h2', {}, '3 caminos posibles'), el('span', {class:'note'}, 'Elige uno para seguir.')));
+
+  const paths = el('div', {class:'paths', role:'radiogroup', 'aria-label':'Caminos posibles'});
+  a.caminos.forEach(c => {
+    const chosen = caminoSeleccionado === c.id;
+    const card = el('article', {class:'path' + (chosen ? ' chosen' : '')},
+      a.recomendado === c.id ? el('span', {class:'reco'}, 'Recomendado para ti') : null,
+      el('div', {class:'letter', 'aria-hidden':'true'}, c.id),
+      el('div', {},
+        el('h3', {}, c.nombre),
+        el('p', {class:'what'}, c.que_es),
+        el('div', {class:'meta'},
+          c.tipo_oferta ? el('span', {class:'tag'}, c.tipo_oferta) : null,
+          c.esfuerzo ? el('span', {class:'tag'}, 'Esfuerzo ' + String(c.esfuerzo).toLowerCase()) : null,
+          c.tiempo_primer_ingreso ? el('span', {class:'tag'}, 'Primer ingreso: ' + c.tiempo_primer_ingreso) : null
+        ),
+        el('dl', {},
+          el('dt', {}, 'Por qué tú'), el('dd', {}, c.por_que_tu || ''),
+          el('dt', {}, 'Primer paso'), el('dd', {}, c.primer_paso || ''),
+          el('dt', {}, 'Riesgo'), el('dd', {}, c.riesgo || '')
+        ),
+        el('button', {class:'btn btn-ghost choose', type:'button', role:'radio', 'aria-checked':String(chosen),
+          onclick: () => { caminoSeleccionado = c.id; renderResultado(false); $('#saveBar').scrollIntoView({block:'nearest'}); }
+        }, chosen ? 'Camino elegido' : 'Elegir este camino')
+      )
+    );
+    paths.append(card);
+  });
+  R.append(paths);
+
+  if (a.recomendado && a.razon_recomendacion){
+    R.append(el('p', {class:'note', style:'margin-top:14px'}, 'Por qué recomendamos el camino ' + a.recomendado + ': ' + a.razon_recomendacion));
+  }
+
+  const guardado = proyecto.etapas.diagnostico;
+  const yaGuardado = guardado && guardado.caminoElegido?.id === caminoSeleccionado && guardado.analisis === a;
+  const bar = el('div', {class:'save-bar', id:'saveBar'},
+    el('p', {}, caminoSeleccionado
+      ? (yaGuardado ? 'Camino ' + caminoSeleccionado + ' guardado en Mi Proyecto. La Etapa 2 partirá de aquí.' : 'Elegiste el camino ' + caminoSeleccionado + '. Guárdalo para usarlo en la siguiente etapa.')
+      : 'Elige un camino para guardarlo en Mi Proyecto.'),
+    el('button', {class:'btn btn-gold', type:'button', disabled: !caminoSeleccionado || yaGuardado ? '' : false, onclick: guardar},
+      yaGuardado ? 'Guardado' : 'Guardar en Mi Proyecto')
+  );
+  R.append(bar);
+  if (yaGuardado) R.append(el('div', {class:'btnrow', style:'margin-top:14px'},
+    el('button', {class:'btn btn-primary', type:'button', onclick:()=>ir('monetiza')}, 'Siguiente: Monetiza tu idea'),
+    el('button', {class:'btn-sm', type:'button', onclick:()=>ir('descubre')}, 'Ver mis oportunidades')));
+
+  if (scroll) R.scrollIntoView({block:'start'});
+}
+
+async function guardar(){
+  const c = analisisActual.caminos.find(x => x.id === caminoSeleccionado);
+  if (!c) return;
+  proyecto.etapas.diagnostico = {
+    respuestas: { ...respuestas },
+    analisis: analisisActual,
+    caminoElegido: c,
+    completada: new Date().toISOString(),
+  };
+  proyecto.areas.oportunidad = { opciones: analisisActual.caminos, elegida: c };
+  await persistir(true);
+  renderRail(); renderResultado(false);
+  toast('Guardado en Mi Proyecto');
+}
+/* =========================================================
+   🦈 CONVIÉRTETE EN UN SHARK DE VENTAS
+   Flujo por nivel: Aprende → Ejemplo → Practica → Feedback → Sube de nivel
+   Estado guardado en proyecto.areas.shark = { niveles:{id:{mejor,estrellas,intentos}}, ejemplos:{id:{...}} }
+   ========================================================= */
+const SHARK = [
+  { id:'hielo', em:'👋', nombre:'Rompe el hielo', skill:'Cómo hablar con el cliente',
+    tips:['Salúdalo y menciona algo real de su situación.','Habla de él, no de ti.','Termina con una pregunta abierta.'],
+    clave:'Primero conexión, después negocio.',
+    criterios:['Saludo cercano y personal','Se enfoca en el cliente, no en vender','Termina con una pregunta abierta'],
+    inicia:'vendedor', situacion:'Una persona que encaja con tu cliente ideal aceptó hablar contigo por chat. Escribe tu primer mensaje.',
+    cliente:'Eres amable pero ocupado. Si el mensaje suena a anuncio, respondes corto y frío. Si te preguntan algo sobre ti, te abres y cuentas un poco.' },
+  { id:'detective', em:'🔎', nombre:'Detective', skill:'Descubrir qué necesita el cliente',
+    tips:['Pregunta antes de ofrecer.','Usa preguntas abiertas: qué, cómo, por qué.','Profundiza: "¿Y eso cómo te afecta?"'],
+    clave:'Quien pregunta, dirige la conversación.',
+    criterios:['Hace preguntas abiertas','Profundiza en el problema real','No ofrece el producto antes de entender'],
+    cliente:'Tienes un problema que esta oferta resuelve, pero NO lo dices directo: lo revelas poco a poco solo si te hacen buenas preguntas. Si te ofrecen el producto sin preguntar, pierdes interés. Empieza con un mensaje vago tipo "vi lo que haces, ¿de qué se trata?".' },
+  { id:'solucion', em:'🧩', nombre:'Presenta la solución', skill:'Presentar la solución',
+    tips:['Repite su problema con sus palabras.','Conecta tu oferta con lo que te dijo.','Máximo 3 puntos. Corto.'],
+    clave:'Tu solución es la respuesta a SU problema.',
+    criterios:['Retoma el problema del cliente','Conecta la solución con su necesidad','Explicación breve y clara'],
+    cliente:'En tu primer mensaje cuentas tu problema concreto (coherente con la oferta) y preguntas "¿y tú cómo me ayudarías?". Si te sueltan un discurso largo o genérico, te pierdes.' },
+  { id:'valor', em:'💎', nombre:'Comunica el valor', skill:'Comunicar el valor',
+    tips:['Resultados, no características.','Muestra el antes y el después.','Ejemplos reales. Nunca inventados.'],
+    clave:'La gente no compra lo que haces, compra lo que logra.',
+    criterios:['Habla de resultados para el cliente','Usa un ejemplo o comparación concreta','No exagera ni promete de más'],
+    cliente:'Ya entiendes qué vende, pero preguntas "¿y eso de qué me sirve a mí?". Las listas de características no te convencen; los resultados concretos sí.' },
+  { id:'precio', em:'💵', nombre:'Di tu precio', skill:'Decir el precio',
+    tips:['Dilo claro y sin pedir perdón.','Recuerda el resultado antes del número.','Después del precio, escucha.'],
+    clave:'Un precio dicho con seguridad se siente justo.',
+    criterios:['Dice el precio claro y directo','Lo conecta con el valor','No se justifica de más ni baja el precio solo'],
+    cliente:'Te interesa y preguntas directo "¿cuánto cuesta?". Si el vendedor titubea, se disculpa o baja el precio sin que lo pidas, empiezas a dudar del valor.' },
+  { id:'objeciones', em:'🛡️', nombre:'Maneja objeciones', skill:'Manejar objeciones',
+    tips:['Reconoce: "Te entiendo".','Pregunta qué hay detrás de la duda.','Responde honesto. Si no es para él, dilo.'],
+    clave:'Una objeción es una pregunta disfrazada.',
+    criterios:['Reconoce la duda con empatía','Descubre la causa real','Responde con honestidad, sin presionar'],
+    cliente:'Te gusta la oferta pero pones una objeción realista (elige una: precio, falta de tiempo, desconfianza o "lo voy a pensar"). La causa real está detrás; solo la cuentas si te preguntan con empatía. Si te presionan, te cierras.' },
+  { id:'cierre', em:'🤝', nombre:'Cierra la venta', skill:'Cerrar la venta',
+    tips:['Propón un siguiente paso concreto.','Pregunta directo: "¿Empezamos?"','Facilita el pago o la fecha.'],
+    clave:'Si no pides la venta, no la tienes.',
+    criterios:['Pide la decisión de forma clara','Propone un siguiente paso concreto','Respeta la decisión del cliente'],
+    cliente:'Estás casi convencido y sin dudas grandes, pero no das el paso por tu cuenta. Empiezas diciendo algo como "suena bien, me gusta". Compras si te proponen un siguiente paso claro y sencillo.' },
+  { id:'seguimiento', em:'📬', nombre:'Haz seguimiento', skill:'Hacer seguimiento',
+    tips:['Muchas ventas llegan después del primer "no".','Aporta algo útil, no solo "¿y?".','Pregunta fácil de responder.'],
+    clave:'El dinero está en el seguimiento.',
+    criterios:['Mensaje amable, sin culpar','Aporta algo de valor o contexto','Pregunta fácil de responder'],
+    inicia:'vendedor', situacion:'Hace 3 días le enviaste tu propuesta y no respondió. Escribe tu mensaje de seguimiento.',
+    cliente:'Estabas interesado pero te distrajiste. Si el mensaje es amable y útil, respondes con interés. Si suena insistente o te hace sentir culpable, respondes frío.' },
+  { id:'final', em:'🦈', nombre:'Reto final', skill:'Venta completa, de principio a fin', boss:true, turnos:6,
+    tips:['Conecta → pregunta → presenta → precio → cierra.','Cada paso a su tiempo.','Honestidad siempre.'],
+    clave:'Un shark no presiona: guía.',
+    criterios:['Descubre la necesidad antes de ofrecer','Comunica valor y precio con claridad','Maneja la duda y propone un cierre sin presión'],
+    cliente:'Eres un cliente real desde cero: llegas con curiosidad, tienes un problema que no cuentas enseguida, preguntarás el precio y pondrás una objeción. Compras solo si el vendedor lo hace bien, sin presión.' },
+];
+const RANGOS = [
+  { min:0, em:'🐟', nombre:'Pececito' },
+  { min:2, em:'🐡', nombre:'Pez globo' },
+  { min:4, em:'🐬', nombre:'Delfín' },
+  { min:6, em:'🦈', nombre:'Tiburón' },
+  { min:9, em:'👑', nombre:'Shark de Ventas' },
+];
+const PASA = 70;
+const PASOS = ['Aprende','Ejemplo','Practica','Feedback','Sube'];
+const estrellasDe = p => p >= 90 ? 3 : p >= 80 ? 2 : p >= PASA ? 1 : 0;
+
+function sharkData(){ return proyecto.areas.shark; }
+function superados(){ return SHARK.filter(n => (sharkData().niveles[n.id]?.estrellas || 0) > 0).length; }
+function xpTotal(){ return SHARK.reduce((s, n) => s + (sharkData().niveles[n.id]?.mejor || 0), 0); }
+function rangoActual(){ const s = superados(); return [...RANGOS].reverse().find(r => s >= r.min); }
+function siguienteRango(){ const s = superados(); return RANGOS.find(r => r.min > s); }
+function nivelAbierto(i){ return i === 0 || (sharkData().niveles[SHARK[i-1].id]?.estrellas || 0) > 0; }
+const starsEl = (n, cls='stars') => el('span', {class:cls, 'aria-label': n + ' de 3 estrellas'}, [0,1,2].map(i => el('span', {class: i < n ? '' : 'off'}, '★')));
+
+function rankBox(){
+  const r = rangoActual(), sig = siguienteRango(), s = superados();
+  const pct = sig ? (s - r.min) / (sig.min - r.min) * 100 : 100;
+  return el('div', {class:'rank'},
+    el('span', {class:'em', 'aria-hidden':'true'}, r.em),
+    el('div', {class:'who'}, el('b', {}, r.nombre),
+      el('small', {}, sig ? `${sig.min - s} ${sig.min - s === 1 ? 'nivel' : 'niveles'} para ser ${sig.nombre} ${sig.em}` : '¡Rango máximo!'),
+      el('div', {class:'xpbar'}, el('i', {style:`width:${pct}%`}))),
+    el('div', {class:'xp'}, xpTotal(), el('small', {}, 'XP')));
+}
+
+/* ---------- vista principal: mapa ---------- */
+function areaShark(root){
+  if (!ui.shark){ renderMapa(root); return; }
+  renderNivel(root);
+}
+function renderMapa(root){
+  root.append(el('div', {class:'ocean'},
+    el('h2', {}, 'Conviértete en un Shark de Ventas 🦈'),
+    el('p', {}, '9 retos para aprender a vender practicando con tu propia oferta. Supera cada nivel con 70 puntos o más.'),
+    rankBox()));
+  root.append(ctxStrip());
+  if (!proyecto.areas.oferta) root.append(el('p', {class:'note', style:'margin:-6px 0 14px'}, 'Los retos son más reales con tu oferta creada. ', el('button', {class:'linkbtn', type:'button', onclick:()=>ir('oferta')}, 'Crear mi oferta')));
+  const map = el('div', {class:'map'});
+  const sigIdx = SHARK.findIndex((n, i) => nivelAbierto(i) && !(sharkData().niveles[n.id]?.estrellas));
+  SHARK.forEach((n, i) => {
+    const d = sharkData().niveles[n.id], open = nivelAbierto(i), st = d?.estrellas || 0;
+    map.append(el('button', {type:'button', disabled: open ? false : '',
+      class:'node' + (st ? ' passed' : '') + (i === sigIdx ? ' next' : '') + (n.boss ? ' boss' : ''),
+      'aria-label': `Nivel ${i+1}: ${n.nombre}` + (open ? '' : ' (bloqueado)'),
+      onclick: () => abrirNivel(i) },
+      el('span', {class:'orb', 'aria-hidden':'true'}, open ? n.em : '🔒'),
+      el('span', {class:'info'},
+        el('b', {}, (n.boss ? '' : 'Nivel ' + (i+1) + ': ') + n.nombre),
+        st ? starsEl(st) : el('small', {}, open ? (i === sigIdx ? '¡Tu siguiente reto!' : n.skill) : 'Supera el nivel anterior'))));
+  });
+  root.append(map);
+}
+function abrirNivel(i){
+  ui.shark = { i, paso:0, ejemploElegido:null, msgs:[], esperando:false, fb:null, resultado:null };
+  renderArea(); window.scrollTo({top:0});
+}
+
+/* ---------- pantalla de nivel ---------- */
+function renderNivel(root){
+  const S = ui.shark, n = SHARK[S.i];
+  root.append(el('div', {class:'btnrow', style:'margin-bottom:12px'},
+    el('button', {class:'btn-sm', type:'button', onclick:()=>{ ui.shark = null; renderArea(); }}, '← Mapa de retos'),
+    el('span', {class:'tag'}, rangoActual().em + ' ' + rangoActual().nombre + ' · ' + xpTotal() + ' XP')));
+  root.append(el('div', {class:'lvl-top'},
+    el('span', {class:'orb', 'aria-hidden':'true'}, n.em),
+    el('div', {}, el('small', {}, n.boss ? 'Reto final' : 'Nivel ' + (S.i+1) + ' de 9'), el('h2', {}, n.nombre))));
+  root.append(el('div', {class:'steps', 'aria-label':'Progreso del nivel'},
+    PASOS.map((p, k) => el('span', {class: k < S.paso ? 'done' : k === S.paso ? 'cur' : '', 'aria-current': k === S.paso ? 'step' : null}, p))));
+  const body = el('div'); root.append(body);
+  [pasoAprende, pasoEjemplo, pasoPractica, pasoFeedback, pasoSube][S.paso](body, n, S);
+}
+function empezarPractica(){ const S = ui.shark; S.msgs = []; S.fb = null; S.resultado = null; avanzar(2); if (!SHARK[S.i].inicia) turnoSharkCliente(); }
+function avanzar(p){ ui.shark.paso = p; renderArea(); window.scrollTo({top:0}); }
+
+/* 1 · Aprende */
+function pasoAprende(root, n){
+  root.append(el('div', {class:'clave'}, n.clave));
+  root.append(el('div', {class:'tips'}, n.tips.map((t, k) => el('div', {class:'tip'}, el('span', {class:'k'}, k+1), el('span', {}, t)))));
+  root.append(el('div', {class:'btnrow'},
+    el('button', {class:'btn btn-primary', type:'button', style:'width:auto', onclick:()=>avanzar(1)}, 'Ver un ejemplo con mi oferta'),
+    el('button', {class:'btn-sm', type:'button', onclick:empezarPractica}, 'Saltar a practicar')));
+}
+
+/* 2 · Ejemplo interactivo */
+async function generarEjemplo(n, btn){
+  const r = await conIA(btn, () => iaJSON(
+    `Crea un mini ejemplo para enseñar la habilidad de ventas "${n.skill}" usando SU oferta real y SU cliente. Da una situación breve, lo que dice el cliente, y 3 posibles respuestas del vendedor: UNA excelente (honesta, clara, sin presión, aplicando: ${n.tips.join(' / ')}) y DOS con errores comunes y distintos entre sí. Mezcla el orden para que la correcta no sea siempre la primera.`,
+    '{"situacion":"1 frase","cliente":"lo que dice el cliente","opciones":[{"texto":"respuesta del vendedor, máx. 45 palabras","correcta":true,"por_que":"1 frase: por qué funciona o qué error comete"}]}',
+    r => Array.isArray(r?.opciones) && r.opciones.length === 3 && r.opciones.filter(o => o.correcta).length === 1));
+  if (r){ sharkData().ejemplos[n.id] = r; ui.shark.ejemploElegido = null; persistir(); renderArea(); }
+}
+function pasoEjemplo(root, n, S){
+  const ej = sharkData().ejemplos[n.id];
+  if (!ej){
+    const b = el('button', {class:'btn btn-primary big-cta', type:'button', onclick: e => generarEjemplo(n, e.currentTarget)}, 'Generar ejemplo con mi oferta');
+    root.append(b);
+    if (!S.generando){ S.generando = true; generarEjemplo(n, b).finally(() => { S.generando = false; }); }
+    return;
+  }
+  root.append(el('div', {class:'sit'}, el('b', {}, 'Situación'), ej.situacion));
+  root.append(el('div', {class:'chat', style:'min-height:0'}, el('div', {class:'bubble cli'}, el('span', {class:'who'}, 'Cliente'), ej.cliente)));
+  root.append(el('p', {class:'sec-title', style:'font-size:1.05rem;margin:16px 0 0'}, '¿Cuál es la mejor respuesta?'));
+  const opts = el('div', {class:'opts'});
+  const elegido = S.ejemploElegido;
+  ej.opciones.forEach((o, k) => {
+    const rev = elegido != null;
+    const cls = !rev ? '' : o.correcta ? ' right' : (k === elegido ? ' wrong' : '');
+    opts.append(el('button', {type:'button', class:'opt' + cls, disabled: rev ? '' : false, onclick:()=>{ S.ejemploElegido = k; renderArea(); }},
+      rev ? el('span', {class:'mark'}, o.correcta ? '✓' : k === elegido ? '✗' : '') : null,
+      o.texto,
+      rev ? el('span', {class:'why'}, o.por_que) : null));
+  });
+  root.append(opts);
+  if (elegido != null){
+    const ok = ej.opciones[elegido].correcta;
+    root.append(el('p', {style:'font-weight:600;margin:14px 0'}, ok ? '¡Bien visto! 🎯' : 'Casi. Mira por qué la correcta funciona mejor.'));
+    root.append(el('div', {class:'btnrow'},
+      el('button', {class:'btn btn-primary', type:'button', style:'width:auto', onclick:empezarPractica}, '¡A practicar! 🦈'),
+      el('button', {class:'btn-sm', type:'button', onclick: e => generarEjemplo(n, e.currentTarget)}, '🔄 Otro ejemplo')));
+  }
+}
+
+/* 3 · Practica con cliente IA */
+function instruccionesShark(n){
+  return `Vas a hacer un juego de rol para entrenar a un emprendedor en ventas. TÚ eres el CLIENTE potencial (no el vendedor).
+
+Lo que vende el emprendedor:
+${ctx()}
+
+Habilidad que está practicando: ${n.skill}.
+Tu papel: ${n.cliente}
+
+Reglas:
+- Habla como una persona real, en español neutro, 1 a 3 frases. Solo tu mensaje, sin narrar ni poner nombres.
+- Reacciona a lo que el vendedor hace bien o mal: si es claro, empático y honesto, avanzas; si presiona, exagera o no te escucha, te enfrías.
+- Nunca rompas el personaje ni des consejos al vendedor.`;
+}
+function turnosShark(){
+  const S = ui.shark, n = SHARK[S.i], ins = instruccionesShark(n), t = [];
+  const msgs = S.msgs.filter(m => !m.pendiente);
+  if (n.inicia === 'vendedor'){
+    msgs.forEach((m, k) => {
+      if (m.de === 'yo') t.push({ role:'user', content: (k === 0 ? ins + '\n\nContexto: ' + n.situacion + '\n\nEl vendedor te escribe: ' : 'El vendedor responde: ') + m.texto });
+      else t.push({ role:'assistant', content:m.texto });
+    });
+  } else {
+    t.push({ role:'user', content: ins + '\n\nEscribe ahora tu primer mensaje al vendedor.' });
+    msgs.forEach(m => t.push(m.de === 'cli' ? { role:'assistant', content:m.texto } : { role:'user', content:'El vendedor responde: ' + m.texto }));
+  }
+  return t;
+}
+async function turnoSharkCliente(){
+  const S = ui.shark;
+  if (!sample){ toast('La IA no está disponible en esta vista.'); return; }
+  S.esperando = true;
+  const m = { de:'cli', texto:'…', pendiente:true }; S.msgs.push(m); renderArea();
+  try{
+    const r = await sample(turnosShark(), { modelTier:'quick', cache:false, onText: ({text}) => {
+      m.texto = text; const b = document.querySelectorAll('.chat .bubble.cli .txt'); if (b.length) b[b.length-1].textContent = text;
+    }});
+    m.texto = r.text.trim(); delete m.pendiente;
+  }catch(e){
+    S.msgs.pop(); toast(ERRORES[e && e.code] || 'El cliente no respondió. Vuelve a intentarlo.');
+  }
+  S.esperando = false;
+  if (ui.shark === S && vista === 'shark'){ renderArea(); const ta = document.querySelector('.composer textarea'); if (ta) ta.focus(); }
+}
+function pasoPractica(root, n, S){
+  const max = n.turnos || 3;
+  const mias = S.msgs.filter(m => m.de === 'yo').length;
+  root.append(el('div', {class:'sit'}, el('b', {}, 'Tu reto'),
+    n.inicia === 'vendedor' ? n.situacion : `Practica: ${n.skill.toLowerCase()}. Responde al cliente.`,
+    el('div', {style:'margin-top:6px;font-size:.86rem;color:var(--muted)'}, 'Te evaluarán en: ' + n.criterios.join(' · '))));
+  const chat = el('div', {class:'chat', 'aria-live':'polite'});
+  if (!S.msgs.length && n.inicia === 'vendedor') chat.append(el('p', {class:'note', style:'margin:auto;text-align:center'}, 'Tú empiezas. Escribe tu mensaje abajo.'));
+  S.msgs.forEach(m => chat.append(el('div', {class:'bubble ' + m.de}, el('span', {class:'who'}, m.de === 'cli' ? 'Cliente' : 'Tú'), el('span', {class:'txt'}, m.texto))));
+  root.append(chat);
+  root.append(el('div', {class:'meter-row', style:'margin-top:10px'}, meter(mias/max*100, 'gold'), el('span', {}, mias + ' de ' + max + ' respuestas')));
+  if (mias < max){
+    const ta = el('textarea', {placeholder:'Escribe como vendedor…', 'aria-label':'Tu respuesta'});
+    const send = el('button', {class:'btn btn-primary', type:'button', style:'width:auto', disabled: S.esperando ? '' : false, onclick: () => {
+      const v = ta.value.trim(); if (!v || S.esperando) return;
+      S.msgs.push({ de:'yo', texto:v });
+      if (S.msgs.filter(m => m.de === 'yo').length < max) turnoSharkCliente(); else renderArea();
+    }}, 'Enviar');
+    ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); send.click(); } });
+    root.append(el('div', {class:'composer'}, ta, send));
+  }
+  root.append(el('div', {class:'btnrow', style:'margin-top:12px'},
+    el('button', {class:'btn-sm gold', type:'button', disabled: mias && !S.esperando ? false : '', onclick: e => evaluarShark(e.currentTarget)}, mias >= max ? '📊 Ver mi resultado' : '📊 Terminar y evaluar'),
+    el('button', {class:'btn-sm', type:'button', onclick:()=>{ S.msgs = []; renderArea(); if (!n.inicia) turnoSharkCliente(); }}, '↺ Reiniciar')));
+}
+
+/* 4 · Feedback */
+async function evaluarShark(btn){
+  const S = ui.shark, n = SHARK[S.i];
+  const transcript = (n.inicia === 'vendedor' ? 'CONTEXTO: ' + n.situacion + '\n' : '') + S.msgs.filter(m => !m.pendiente).map(m => (m.de === 'cli' ? 'CLIENTE: ' : 'VENDEDOR: ') + m.texto).join('\n');
+  const r = await conIA(btn, () => iaJSON(
+    `Eres un entrenador de ventas exigente pero amable. Evalúa al VENDEDOR en la habilidad "${n.skill}" con estos criterios: ${n.criterios.map((c,k)=>(k+1)+'. '+c).join(' ')}. Penaliza fuerte cualquier presión, urgencia falsa, manipulación o promesa exagerada. Puntaje de 0 a 100: 70 = aprobado.\n\nCONVERSACIÓN\n${transcript}`,
+    `{"puntaje":75,"criterios":[{"nombre":"criterio tal cual","cumple":true,"nota":"máx. 12 palabras"}],"bien":"1 frase concreta citando lo que escribió","mejorar":"1 frase concreta","frase_shark":"cómo lo diría un vendedor experto en esta situación, honesto y sin presión, máx. 45 palabras","alerta":"si presionó o manipuló, 1 frase; si no, cadena vacía"}  (criterios: exactamente ${n.criterios.length}, en el mismo orden)`,
+    r => typeof r?.puntaje === 'number' && Array.isArray(r.criterios)));
+  if (!r) return;
+  const p = Math.max(0, Math.min(100, Math.round(r.puntaje)));
+  const d = sharkData().niveles[n.id] || { mejor:0, estrellas:0, intentos:0 };
+  const antes = { mejor:d.mejor, estrellas:d.estrellas, rango:rangoActual().nombre };
+  d.intentos++; d.mejor = Math.max(d.mejor, p); d.estrellas = Math.max(d.estrellas, estrellasDe(p));
+  sharkData().niveles[n.id] = d;
+  S.fb = { ...r, puntaje:p };
+  S.resultado = { p, estrellas: estrellasDe(p), xpGanado: Math.max(0, d.mejor - antes.mejor), subioRango: rangoActual().nombre !== antes.rango, nuevoRecord: p > antes.mejor && antes.mejor > 0 };
+  persistir(); renderRail(); avanzar(3);
+}
+function pasoFeedback(root, n, S){
+  const f = S.fb; if (!f){ avanzar(2); return; }
+  root.append(el('div', {class:'card'},
+    el('div', {class:'fb-top'},
+      el('div', {class:'ring', style:`--p:${f.puntaje}`}, el('span', {}, f.puntaje)),
+      el('div', {}, starsEl(estrellasDe(f.puntaje)), el('p', {style:'margin:6px 0 0;font-weight:600'}, f.puntaje >= PASA ? '¡Aprobado!' : `Necesitas ${PASA} para pasar`))),
+    f.alerta ? el('div', {class:'alert'}, '⚠️ ' + f.alerta) : null,
+    el('ul', {class:'crit'}, f.criterios.map(c => el('li', {},
+      el('span', {class:'ic ' + (c.cumple ? 'y' : 'n')}, c.cumple ? '✓' : '✗'),
+      el('span', {}, el('b', {}, c.nombre), c.nota ? el('span', {class:'small', style:'display:block;color:var(--muted);font-size:.88rem'}, c.nota) : null)))),
+    el('p', {}, el('b', {}, '👍 '), f.bien || ''),
+    el('p', {}, el('b', {}, '🎯 '), f.mejorar || ''),
+    el('p', {style:'margin-bottom:4px'}, el('b', {}, 'Así lo diría un shark 🦈')),
+    el('div', {class:'msgbox'}, f.frase_shark || '')));
+  root.append(el('button', {class:'btn btn-primary', type:'button', style:'width:auto', onclick:()=>avanzar(4)}, 'Continuar'));
+}
+
+/* 5 · Sube de nivel */
+function pasoSube(root, n, S){
+  const R = S.resultado; if (!R){ avanzar(0); return; }
+  const r = rangoActual(), sigN = SHARK[S.i+1], pasa = R.estrellas > 0;
+  root.append(el('div', {class:'levelup'},
+    el('div', {class:'big-stars pop'}, [0,1,2].map(i => el('span', {class: i < R.estrellas ? '' : 'off'}, '★'))),
+    el('h3', {}, pasa ? (n.boss ? '¡Eres un Shark! 🦈' : '¡Nivel superado!') : 'Sigue practicando'),
+    el('p', {}, pasa ? `${R.p} puntos en ${n.nombre}.` : `Sacaste ${R.p}. Con ${PASA} desbloqueas el siguiente nivel.`),
+    R.xpGanado ? el('span', {class:'gain'}, '+' + R.xpGanado + ' XP') : null,
+    R.subioRango ? el('p', {style:'font-size:1.2rem;font-weight:700'}, `Nuevo rango: ${r.em} ${r.nombre}`) : null,
+    el('div', {class:'btnrow', style:'justify-content:center'},
+      pasa && sigN ? el('button', {class:'btn-sm', type:'button', onclick:()=>abrirNivel(S.i+1)}, 'Siguiente: ' + sigN.nombre + ' ' + sigN.em) : null,
+      el('button', {class:'btn-sm ghost', type:'button', onclick:()=>{ abrirNivel(S.i); empezarPractica(); }}, R.estrellas < 3 ? (pasa ? 'Repetir por 3 ★' : 'Intentar de nuevo') : 'Repetir'),
+      el('button', {class:'btn-sm ghost', type:'button', onclick:()=>{ ui.shark = null; renderArea(); }}, 'Ver mapa'))));
+  root.append(el('div', {style:'margin-top:16px'}, el('div', {class:'ocean', style:'padding:14px 16px'}, rankBox())));
+}
+/* =========================================================
+   💰 MI RUTA DE INGRESOS
+   proyecto.areas.ruta = { precio, conversion, custom, logradas:{id:fecha}, planes:{id:plan}, prospectos:[...] }
+   Cada meta tiene una FASE distinta: la estrategia evoluciona de
+   conseguir las primeras ventas a optimizar y escalar.
+   ========================================================= */
+const METAS = [
+  { id:'m300', meta:300, fase:'Primeras ventas', em:'🌱', guia:'Validar que alguien paga. Red cercana, contacto 1 a 1, precio de entrada, cero inversión. Nada de automatizar todavía.' },
+  { id:'m500', meta:500, fase:'Tracción', em:'🚶', guia:'Repetir lo que funcionó con los primeros clientes, pedir referidos y testimonios reales, elegir un primer canal constante.' },
+  { id:'m1k', meta:1000, fase:'Sistema de clientes', em:'⚙️', guia:'Flujo semanal predecible de prospectos: rutina de contacto, contenido o alianzas, seguimiento ordenado y un primer ajuste de precio.' },
+  { id:'m2k5', meta:2500, fase:'Subir el ticket', em:'💎', guia:'Paquetes y niveles de oferta (básico, completo, premium), ventas adicionales, clientes de mayor valor: menos clientes mejor pagados.' },
+  { id:'m5k', meta:5000, fase:'Optimizar conversión', em:'🎯', guia:'Medir y mejorar cada tasa del embudo, guion de venta afinado, seguimiento sistemático e ingresos recurrentes (membresía, iguala mensual, suscripción).' },
+  { id:'m10k', meta:10000, fase:'Escalar', em:'🚀', guia:'Productizar la oferta, delegar lo operativo, canales escalables (alianzas, afiliados, anuncios solo con presupuesto probado) y procesos documentados.' },
+  { id:'m20k', meta:20000, fase:'Equipo y canales', em:'🏗️', guia:'Equipo de ventas o entrega, varios canales en paralelo, oferta de alto valor y métricas semanales por canal.' },
+  { id:'m30k', meta:30000, fase:'Negocio escalable', em:'🏦', guia:'Retención y valor de vida del cliente, nuevas líneas de ingreso, liderazgo del equipo, márgenes y sistemas que funcionen sin ti.' },
+];
+const ESTADOS = ['Por contactar','Contactado','Respondió','Interesado','Cliente','No por ahora'];
+const fmt = n => '$' + Math.round(n).toLocaleString('en-US');
+const fmtK = n => n >= 1000 ? '$' + (n/1000).toLocaleString('en-US', {maximumFractionDigits:1}) + 'K' : '$' + n;
+
+function rutaData(){ return proyecto.areas.ruta; }
+function metaCustom(){
+  const c = rutaData().custom; if (!c) return null;
+  const base = [...METAS].reverse().find(m => m.meta <= c) || METAS[0];
+  return { id:'custom', meta:c, fase: c > 30000 ? 'Meta sin límite' : base.fase, em:'⭐', guia: base.guia + (c > 30000 ? ' A esta escala: diversificar líneas de negocio, equipo directivo, alianzas estratégicas y adquisición de clientes a gran escala.' : '') };
+}
+function todasMetas(){ const c = metaCustom(); return c ? [...METAS, c] : METAS; }
+function metaPorId(id){ return todasMetas().find(m => m.id === id); }
+function metaActualIdx(){ const i = METAS.findIndex(m => !rutaData().logradas[m.id]); return i < 0 ? METAS.length - 1 : i; }
+function metaAbierta(i){ return i <= metaActualIdx(); }
+
+function precioBase(){
+  const r = rutaData();
+  if (r.precio > 0) return r.precio;
+  const txt = proyecto.areas.oferta?.precio?.monto || proyecto.areas.monetizacion?.elegido?.precio_ejemplo || '';
+  const m = String(txt).match(/\d[\d.,]*/); if (!m) return 0;
+  let s = m[0];
+  if (/^\d{1,3}([.,]\d{3})+$/.test(s)) s = s.replace(/[.,]/g, ''); else s = s.replace(',', '.');
+  const v = parseFloat(s); return v > 0 ? v : 0;
+}
+function conversionBase(){
+  const r = rutaData(), L = proyecto.areas.lanzamiento;
+  if (r.conversion) return r.conversion;
+  if (L.contactos >= 10 && L.clientes > 0) return Math.max(1, Math.round(L.clientes / L.contactos * 100));
+  return 10;
+}
+function ingresosMes(){
+  const k = new Date().toISOString().slice(0, 7);
+  return (proyecto.areas.lanzamiento.log || []).filter(v => v.fecha.slice(0, 7) === k).reduce((s, v) => s + v.monto, 0);
+}
+function ventasMes(){
+  const k = new Date().toISOString().slice(0, 7);
+  return (proyecto.areas.lanzamiento.log || []).filter(v => v.fecha.slice(0, 7) === k).length;
+}
+function registrarVenta(v){
+  const L = proyecto.areas.lanzamiento;
+  L.ingresos = Math.round((L.ingresos + v) * 100) / 100; L.numVentas++;
+  (L.log = L.log || []).push({ monto:v, fecha:new Date().toISOString() });
+  persistir(); renderRail(); renderArea();
+  toast(L.numVentas === 1 ? '🎉 ¡Tu primera venta!' : 'Venta registrada');
+}
+
+/* ---------- plan con IA ---------- */
+function planAnteriorResumen(m){
+  const i = METAS.findIndex(x => x.id === m.id);
+  const prevs = (i < 0 ? METAS.filter(x => x.meta < m.meta) : METAS.slice(0, i)).slice(-2);
+  return prevs.map(p => { const pl = rutaData().planes[p.id]; return pl ? `- ${fmt(p.meta)} (${p.fase}): ${pl.enfoque}. Estrategias: ${[...(pl.estrategias?.sin_redes||[]), ...(pl.estrategias?.con_redes||[])].map(e=>e.nombre).join(', ')}` : ''; }).filter(Boolean).join('\n');
+}
+async function generarPlan(m, btn){
+  const precio = precioBase(), conv = conversionBase();
+  const ventas = precio ? Math.ceil(m.meta / precio) : null;
+  const anterior = planAnteriorResumen(m);
+  const tarea = `Crea el plan para llegar a ${fmt(m.meta)} al MES con este negocio.
+Fase de este nivel: "${m.fase}". Enfoque de la fase: ${m.guia}
+Precio actual por venta: ${precio ? fmt(precio) : 'no definido (propón uno realista)'}. Ventas necesarias al mes con ese precio: ${ventas ?? 'por calcular'}. Tasa de cierre estimada: ${conv}%.
+${anterior ? 'PLANES DE NIVELES ANTERIORES (NO los repitas; este plan debe evolucionar y subir de escala):\n' + anterior : 'Es el primer nivel: todo debe apuntar a conseguir las primeras ventas.'}
+Adapta TODO a qué vende, su precio, su tipo de cliente y esta meta. Si con el precio actual la meta exige un volumen irreal para su tiempo, dilo y propón cómo cambiar el modelo (subir ticket, paquetes, recurrencia).`;
+  const formato = `{
+"enfoque":"1 frase: la estrategia central de este nivel",
+"que_cambia":"1 frase: qué hace distinto respecto al nivel anterior",
+"realismo":"1 frase honesta sobre si la meta es alcanzable con su precio y tiempo, y qué ajustar",
+"donde":[{"lugar":"lugar concreto donde están sus compradores","por_que":"1 frase","como":"acción concreta"}],
+"estrategias":{"sin_redes":[{"nombre":"","pasos":"1-2 frases"}],"con_redes":[{"nombre":"","pasos":"1-2 frases"}]},
+"mensajes":[{"para":"a quién o en qué situación","canal":"","texto":"mensaje listo para enviar, humano y sin presión"}],
+"presentar":["4 a 5 pasos del guion para presentar y vender la oferta, 1 frase cada uno"],
+"practica":{"situacion":"situación de venta típica de este nivel","objecion":"lo que diría el cliente"},
+"seguimiento":[{"cuando":"ej. Día 2","accion":"qué hacer o enviar"}],
+"crecer":{"ticket":["2 ideas"],"conversion":["2 ideas"],"repetidas":["2 ideas"]},
+"hoy":[{"texto":"acción concreta para hoy","minutos":20}],
+"proximos":["3 próximos pasos para las siguientes semanas"]
+}
+Cantidades: donde 3-4, sin_redes 2-3, con_redes 2-3, mensajes 3, seguimiento 3-4, hoy 4-5.`;
+  const r = await conIA(btn, () => iaJSON(tarea, formato, r => r?.enfoque && Array.isArray(r.donde) && r.estrategias && Array.isArray(r.mensajes) && Array.isArray(r.hoy)));
+  if (r){
+    r.hoy = r.hoy.map(t => ({ ...t, hecho:false }));
+    r.proximos = (r.proximos || []).map(t => ({ texto: typeof t === 'string' ? t : t.texto, hecho:false }));
+    r.creado = new Date().toISOString(); r.precioUsado = precio;
+    rutaData().planes[m.id] = r; persistir(); renderArea();
+  }
+}
+
+/* ---------- vista ---------- */
+function areaRuta(root){
+  const R = rutaData();
+  const idx = metaActualIdx();
+  if (!ui.ruta) ui.ruta = { sel: METAS[idx].id, abiertos: new Set(['hoy']) };
+  const m = metaPorId(ui.ruta.sel) || METAS[idx];
+
+  const track = el('div', {class:'track', role:'list'});
+  METAS.forEach((x, i) => {
+    const done = !!R.logradas[x.id], open = metaAbierta(i);
+    track.append(el('button', {type:'button', role:'listitem', class:'mile' + (done ? ' done' : '') + (i === idx && !done ? ' cur' : '') + (m.id === x.id ? ' sel' : '') + (open ? '' : ' lock'),
+      'aria-label': fmt(x.meta) + ' al mes, ' + x.fase + (done ? ', lograda' : open ? '' : ', bloqueada'),
+      onclick: async () => {
+        if (!open){
+          if (!await confirmar(`¿Ya generas al menos ${fmt(METAS[i-1].meta)} al mes? Marcaremos las metas anteriores como logradas.`)) return;
+          METAS.slice(0, i).forEach(p => { if (!R.logradas[p.id]) R.logradas[p.id] = new Date().toISOString(); });
+          persistir();
+        }
+        ui.ruta.sel = x.id; renderArea();
+      }},
+      el('span', {class:'st', 'aria-hidden':'true'}, done ? '✓' : open ? x.em : '🔒'),
+      el('b', {}, fmtK(x.meta)), el('small', {}, x.fase)));
+  });
+  const c = metaCustom();
+  track.append(el('button', {type:'button', role:'listitem', class:'mile' + (m.id === 'custom' ? ' sel' : ''), onclick: () => {
+    if (c){ ui.ruta.sel = 'custom'; ui.ruta.editCustom = false; } else ui.ruta.editCustom = true;
+    renderArea();
+  }}, el('span', {class:'st', 'aria-hidden':'true'}, '⭐'), el('b', {}, c ? fmtK(c.meta) : '+ Tu meta'), el('small', {}, c ? 'Personalizada' : 'Sin límite')));
+  let customBox = null;
+  if (ui.ruta.editCustom || (m.id === 'custom')){
+    const cIn = el('input', {type:'text', inputmode:'numeric', value: c ? String(c.meta) : '', placeholder:'Ej. 50000', 'aria-label':'Tu meta mensual en USD', style:'width:140px;padding:8px 10px'});
+    const guardarC = () => {
+      const v = parseFloat(cIn.value.replace(/[^\d.]/g, '')); if (!(v > 0)){ toast('Escribe una cantidad'); return; }
+      if (!c || c.meta !== v){ R.custom = v; delete R.planes.custom; }
+      ui.ruta.sel = 'custom'; ui.ruta.editCustom = false; persistir(); renderArea();
+    };
+    cIn.addEventListener('keydown', e => { if (e.key === 'Enter') guardarC(); });
+    customBox = el('div', {class:'btnrow', style:'margin-top:12px'}, el('span', {}, 'Tu meta al mes: $'), cIn, el('button', {class:'btn-sm gold', type:'button', onclick:guardarC}, c ? 'Cambiar meta' : 'Crear meta'));
+    if (ui.ruta.editCustom) setTimeout(() => cIn.focus(), 0);
+  }
+  root.append(el('div', {class:'money-hero'},
+    el('h2', {}, 'Mi Ruta de Ingresos 💰'),
+    el('p', {}, 'Cada meta trae su propio plan. Mientras subes, la estrategia pasa de conseguir tus primeras ventas a optimizar y escalar.'),
+    track, customBox));
+  root.append(ctxStrip());
+
+  /* objetivo + progreso */
+  const logrado = ingresosMes(), pct = Math.min(100, logrado / m.meta * 100), done = !!R.logradas[m.id];
+  const monto = el('input', {type:'text', inputmode:'decimal', placeholder:'Monto', 'aria-label':'Monto de la venta', style:'width:110px;padding:8px 10px'});
+  const reg = () => { const v = parseFloat(String(monto.value).replace(',', '.')); if (!(v > 0)){ toast('Escribe el monto de la venta'); return; } registrarVenta(v); };
+  monto.addEventListener('keydown', e => { if (e.key === 'Enter') reg(); });
+  root.append(el('section', {class:'card'},
+    el('div', {class:'goal'},
+      el('div', {style:'flex:1;min-width:200px'},
+        el('span', {class:'phase'}, m.em + ' ' + m.fase),
+        el('div', {class:'amt', style:'margin-top:8px'}, fmt(m.meta), el('small', {}, ' al mes'))),
+      el('div', {class:'ring', style:`--p:${pct}`}, el('span', {style:'font-size:1.4rem'}, Math.round(pct) + '%'))),
+    el('div', {class:'meter-row', style:'margin:10px 0 4px'}, meter(pct, 'gold'), el('span', {}, fmt(logrado) + ' este mes')),
+    el('div', {class:'btnrow', style:'margin-top:10px'}, monto, el('button', {class:'btn-sm gold', type:'button', onclick:reg}, '＋ Registrar venta'),
+      done ? el('span', {class:'tag'}, '✓ Meta lograda') : null),
+    logrado >= m.meta && !done && m.id !== 'custom' ? el('div', {class:'offer-ready', style:'margin:14px 0 0'},
+      el('h3', {}, '🎉 ¡Llegaste a ' + fmt(m.meta) + '!'),
+      el('p', {}, 'Sube de nivel: tu siguiente plan cambia de estrategia.'),
+      el('button', {class:'btn-sm', type:'button', onclick:() => { R.logradas[m.id] = new Date().toISOString(); const nx = METAS[METAS.findIndex(x => x.id === m.id) + 1]; if (nx) ui.ruta.sel = nx.id; persistir(); renderRail(); renderArea(); toast('¡Nivel desbloqueado!'); }}, 'Subir de nivel')) : null));
+
+  /* calculadora */
+  const precio = precioBase(), conv = conversionBase();
+  const ventas = precio ? Math.ceil(m.meta / precio) : 0;
+  const contactos = ventas ? Math.ceil(ventas / (conv / 100)) : 0;
+  const pIn = el('input', {type:'text', inputmode:'decimal', value: precio ? String(precio) : '', placeholder:'Ej. 49', 'aria-label':'Precio por venta'});
+  pIn.addEventListener('change', () => { const v = parseFloat(pIn.value.replace(',', '.')); R.precio = v > 0 ? v : 0; persistir(); renderArea(); });
+  const convChips = el('div', {class:'chips', role:'radiogroup', 'aria-label':'Tasa de cierre'});
+  [5, 10, 20, 30].forEach(v => convChips.append(el('button', {type:'button', class:'chip', role:'radio', 'aria-checked': String(conv === v), onclick:() => { R.conversion = v; persistir(); renderArea(); }}, v + '%')));
+  root.append(el('section', {class:'card'},
+    el('h3', {}, 'Lo que necesitas para llegar'),
+    el('div', {class:'calc-in'}, el('label', {}, 'Precio por venta ($) '), pIn, el('span', {class:'note'}, 'Cierre:'), convChips),
+    precio ? el('div', {class:'calc'},
+      el('div', {class:'c'}, el('b', {}, ventas), el('span', {}, 'ventas al mes')),
+      el('div', {class:'c'}, el('b', {}, Math.ceil(ventas / 4.3)), el('span', {}, 'ventas por semana')),
+      el('div', {class:'c'}, el('b', {}, contactos), el('span', {}, 'conversaciones al mes')),
+      el('div', {class:'c'}, el('b', {}, Math.ceil(contactos / 22)), el('span', {}, 'contactos por día'))) :
+      el('p', {class:'note', style:'margin-top:10px'}, 'Escribe tu precio para calcular.'),
+    precio ? el('p', {class:'small', style:'margin:0'}, `Si subes tu precio a ${fmt(precio * 1.5)}: ${Math.ceil(m.meta / (precio * 1.5))} ventas. Con un cliente recurrente de ${fmt(precio)} al mes, necesitas ${ventas} clientes activos, no ${ventas} ventas nuevas cada mes.`) : null));
+
+  /* plan */
+  const plan = R.planes[m.id];
+  if (!plan){
+    const b = el('button', {class:'btn btn-primary big-cta', type:'button', onclick: e => generarPlan(m, e.currentTarget)}, `Crear mi plan para ${fmt(m.meta)}`);
+    root.append(b, el('p', {class:'note', style:'margin-top:8px'}, 'Tarda cerca de un minuto: se arma con tu oferta, tu cliente y esta meta.'));
+    return;
+  }
+  root.append(renderPlan(m, plan));
+}
+
+function seccion(id, ic, titulo, cnt, ...contenido){
+  const d = el('details', {class:'sec', open: ui.ruta.abiertos.has(id) ? '' : false},
+    el('summary', {}, el('span', {class:'ic', 'aria-hidden':'true'}, ic), titulo, cnt ? el('span', {class:'cnt'}, cnt) : null),
+    el('div', {class:'in'}, ...contenido));
+  d.addEventListener('toggle', () => { d.open ? ui.ruta.abiertos.add(id) : ui.ruta.abiertos.delete(id); });
+  return d;
+}
+function agregarAHoy(plan, texto){ plan.hoy.push({ texto, minutos:null, hecho:false }); persistir(); renderArea(); toast('Agregado a Hoy'); }
+
+function renderPlan(m, plan){
+  const wrap = el('div');
+  const hechos = plan.hoy.filter(t => t.hecho).length + plan.proximos.filter(t => t.hecho).length;
+  const total = plan.hoy.length + plan.proximos.length;
+  wrap.append(el('section', {class:'card pick'},
+    el('h3', {}, plan.enfoque),
+    plan.que_cambia ? el('p', {class:'evol'}, '📈 ', el('b', {style:'display:inline'}, 'Qué cambia en este nivel: '), plan.que_cambia) : null,
+    plan.realismo ? el('p', {class:'small', style:'margin:10px 0 0'}, '🧭 ' + plan.realismo) : null,
+    el('div', {class:'meter-row', style:'margin-top:12px'}, meter(total ? hechos/total*100 : 0), el('span', {}, `Plan: ${hechos} de ${total} acciones`))));
+
+  const checks = (arr, pref) => { const ul = el('ul', {class:'checks'}); arr.forEach((t, i) => {
+    const id = pref + i;
+    ul.append(el('li', {class: t.hecho ? 'done' : ''},
+      el('input', {type:'checkbox', id, checked: t.hecho ? '' : false, onchange: e => { t.hecho = e.target.checked; persistir(); renderArea(); if (t.hecho) toast('¡Hecho!'); }}),
+      el('label', {for:id}, t.texto), t.minutos ? el('span', {class:'mins'}, t.minutos + ' min') : null)); }); return ul; };
+
+  const hoyH = plan.hoy.filter(t => t.hecho).length;
+  wrap.append(seccion('hoy', '✅', 'Qué hacer hoy', `${hoyH}/${plan.hoy.length}`, meter(plan.hoy.length ? hoyH/plan.hoy.length*100 : 0, 'gold'), checks(plan.hoy, 'rh')));
+
+  wrap.append(seccion('donde', '📍', 'Dónde encontrar clientes', plan.donde.length + ' lugares',
+    ...plan.donde.map(d => el('div', {class:'item'}, el('b', {}, d.lugar), el('p', {}, d.por_que), el('p', {}, el('b', {style:'display:inline'}, 'Cómo: '), d.como),
+      el('button', {class:'btn-sm', type:'button', onclick:() => agregarAHoy(plan, d.como)}, '＋ Agregar a hoy')))));
+
+  const tabE = ui.ruta.tabE || 'sin_redes';
+  const est = plan.estrategias[tabE] || [];
+  wrap.append(seccion('estr', '🧠', 'Estrategias para conseguirlos', null,
+    el('div', {class:'tabs'},
+      el('button', {type:'button', class:'btn-sm' + (tabE === 'sin_redes' ? ' on' : ''), onclick:() => { ui.ruta.tabE = 'sin_redes'; renderArea(); }}, 'Sin redes sociales'),
+      el('button', {type:'button', class:'btn-sm' + (tabE === 'con_redes' ? ' on' : ''), onclick:() => { ui.ruta.tabE = 'con_redes'; renderArea(); }}, 'Con redes sociales')),
+    ...est.map(e => el('div', {class:'item'}, el('b', {}, e.nombre), el('p', {}, e.pasos),
+      el('button', {class:'btn-sm', type:'button', onclick:() => agregarAHoy(plan, e.nombre + ': ' + e.pasos)}, '＋ Agregar a hoy')))));
+
+  wrap.append(seccion('msg', '💬', 'Mensajes para acercarte', plan.mensajes.length + ' listos',
+    ...plan.mensajes.map(x => el('div', {class:'item'},
+      el('div', {class:'btnrow'}, el('span', {class:'tag'}, x.para), x.canal ? el('span', {class:'tag'}, x.canal) : null),
+      el('div', {class:'msgbox'}, x.texto),
+      el('div', {class:'btnrow'},
+        el('button', {class:'btn-sm', type:'button', onclick:() => copiar(x.texto)}, 'Copiar'),
+        el('button', {class:'btn-sm gold', type:'button', onclick:() => { proyecto.areas.lanzamiento.contactos++; persistir(); renderRail(); toast('+1 contacto en tu tablero'); }}, '📤 Lo envié'),
+        el('button', {class:'btn-sm', type:'button', onclick:() => { ui.ruta.abiertos.add('seg'); ui.ruta.prefill = x.para; renderArea(); setTimeout(() => { const i = document.getElementById('prosIn'); if (i){ i.scrollIntoView({block:'center'}); i.focus(); } }, 0); }}, '＋ Guardar prospecto'))))));
+
+  wrap.append(seccion('pres', '🎤', 'Cómo presentar y vender tu oferta', null,
+    el('ol', {class:'steps-list'}, (plan.presentar || []).map(p => el('li', {}, p)))));
+
+  const pr = plan.practica || {};
+  wrap.append(seccion('prac', '🦈', 'Practica esta venta con IA', null,
+    el('div', {class:'sit'}, el('b', {}, 'Situación de este nivel'), pr.situacion || ''),
+    el('div', {class:'chat', style:'min-height:0;margin-bottom:12px'}, el('div', {class:'bubble cli'}, el('span', {class:'who'}, 'Cliente'), pr.objecion || '')),
+    el('div', {class:'btnrow'},
+      el('button', {class:'btn-sm on', type:'button', onclick:() => {
+        if (!sample){ toast('La IA no está disponible en esta vista.'); return; }
+        ui.sim = { esc:{ id:'ruta', t:'"' + (pr.objecion || '') + '"', d: pr.situacion || '' }, msgs:[], feedback:null, esperando:false };
+        ir('vende'); turnoCliente();
+      }}, '🎙️ Practicar esta situación'),
+      el('button', {class:'btn-sm', type:'button', onclick:() => ir('shark')}, 'Entrenar en Shark de Ventas'))));
+
+  wrap.append(seccion('seg', '📬', 'Seguimiento de posibles clientes', rutaData().prospectos.length + ' prospectos',
+    el('div', {class:'cadence'}, (plan.seguimiento || []).map(s => el('div', {class:'cd'}, el('b', {}, s.cuando), s.accion))),
+    renderCRM()));
+
+  const cr = plan.crecer || {};
+  wrap.append(seccion('crecer', '📊', 'Más ticket, más conversión, más recompras', null,
+    el('div', {class:'grow'},
+      el('div', {}, el('h4', {}, '💎 Subir ticket'), el('ul', {}, (cr.ticket||[]).map(x => el('li', {}, x)))),
+      el('div', {}, el('h4', {}, '🎯 Más conversión'), el('ul', {}, (cr.conversion||[]).map(x => el('li', {}, x)))),
+      el('div', {}, el('h4', {}, '🔁 Ventas repetidas'), el('ul', {}, (cr.repetidas||[]).map(x => el('li', {}, x)))))));
+
+  const px = plan.proximos.filter(t => t.hecho).length;
+  wrap.append(seccion('prox', '🧭', 'Próximos pasos', `${px}/${plan.proximos.length}`, checks(plan.proximos, 'rp')));
+
+  wrap.append(el('div', {class:'btnrow', style:'margin-top:10px'},
+    el('button', {class:'btn-sm', type:'button', onclick: async e => { const b = e.currentTarget; if (await confirmar('¿Crear un plan nuevo para esta meta? Se reemplaza el actual.')) generarPlan(m, b); }}, '🔄 Rehacer este plan')));
+  return wrap;
+}
+
+/* ---------- mini CRM de prospectos ---------- */
+function renderCRM(){
+  const P = rutaData().prospectos;
+  const box = el('div');
+  box.append(el('div', {class:'pipe'}, ESTADOS.map(s => el('span', {}, s + ' ', el('b', {}, P.filter(p => p.estado === s).length)))));
+  const pre = ui.ruta.prefill;
+  const nIn = el('input', {type:'text', id:'prosIn', placeholder: pre ? 'Nombre de a quién le escribiste' : 'Nombre del posible cliente', 'aria-label':'Nuevo prospecto'});
+  const add = () => { const v = nIn.value.trim(); if (!v) return; P.unshift({ id:'p' + Date.now(), nombre:v, nota: pre || '', estado: pre ? 'Contactado' : 'Por contactar', actualizado:new Date().toISOString() }); ui.ruta.prefill = null; persistir(); renderArea(); toast('Prospecto guardado'); };
+  nIn.addEventListener('keydown', e => { if (e.key === 'Enter') add(); });
+  box.append(el('div', {class:'addrow', style:'margin:0 0 10px'}, nIn, el('button', {class:'btn-sm', type:'button', onclick:add}, 'Agregar')));
+  const list = el('div', {class:'crm'});
+  P.forEach(p => {
+    const dias = Math.floor((Date.now() - new Date(p.actualizado)) / 864e5);
+    const sel = el('select', {'aria-label':'Estado de ' + p.nombre, onchange: e => {
+      p.estado = e.target.value; p.actualizado = new Date().toISOString();
+      const L = proyecto.areas.lanzamiento;
+      if (p.estado === 'Respondió') L.respuestas++;
+      if (p.estado === 'Cliente'){ L.clientes++; toast('¡Nuevo cliente! Registra la venta arriba.'); }
+      persistir(); renderRail(); renderArea();
+    }}, ESTADOS.map(s => el('option', {selected: s === p.estado ? '' : false}, s)));
+    list.append(el('div', {class:'pros'},
+      el('span', {class:'nm'}, p.nombre), sel,
+      el('span', {class:'nt'}, (p.nota ? p.nota + '. ' : '') + (dias ? `Último movimiento hace ${dias} ${dias === 1 ? 'día' : 'días'}` : 'Actualizado hoy')),
+      p.msg ? el('div', {class:'msgbox', style:'grid-column:1/-1;margin:4px 0'}, p.msg) : null,
+      el('div', {class:'acts'},
+        !['Cliente','No por ahora'].includes(p.estado) ? el('button', {class:'btn-sm', type:'button', onclick: async e => {
+          const r = await conIA(e.currentTarget, () => iaJSON(
+            `Escribe un mensaje de seguimiento para este posible cliente. Estado: ${p.estado}. Nota: ${p.nota || 'sin nota'}. Días desde el último contacto: ${dias}. Amable, útil, sin presión, con una pregunta fácil de responder.`,
+            '{"texto":"mensaje listo para enviar, máx. 60 palabras"}', r => r?.texto));
+          if (r){ p.msg = r.texto; persistir(); renderArea(); }
+        }}, '✍️ Mensaje de seguimiento') : null,
+        p.msg ? el('button', {class:'btn-sm', type:'button', onclick:() => copiar(p.msg)}, 'Copiar') : null,
+        el('button', {class:'btn-sm', type:'button', 'aria-label':'Eliminar ' + p.nombre, onclick:() => { rutaData().prospectos = P.filter(x => x !== p); persistir(); renderArea(); }}, 'Quitar'))));
+  });
+  if (!P.length) list.append(el('p', {class:'note'}, 'Agrega a las personas con las que hablas para no perder ninguna.'));
+  box.append(list);
+  return box;
+}
+/* =========================================================
+   MI PROYECTO · PROGRESO
+   ========================================================= */
+function resumenArea(id){
+  const a = proyecto.areas, d = proyecto.etapas.diagnostico;
+  switch(id){
+    case 'diagnostico': return d ? PARTIDA[d.respuestas?.puntoPartida] : null;
+    case 'descubre': return a.oportunidad?.elegida?.nombre;
+    case 'monetiza': return a.monetizacion?.elegido ? a.monetizacion.elegido.tipo + ': ' + a.monetizacion.elegido.nombre : null;
+    case 'oferta': return a.oferta ? a.oferta.nombre + (a.oferta.precio?.monto ? ' por ' + a.oferta.precio.monto : '') + ' (' + OF_CAMPOS.filter(c => a.oferta.ok?.[c.k]).length + '/5 aprobadas)' : null;
+    case 'clientes': { const p = a.clientes.plan; return p ? p.filter(t=>t.hecho).length + ' de ' + p.length + ' tareas de hoy' : (a.clientes.mensajes ? 'Mensajes listos' : null); }
+    case 'vende': { const pr = a.ventas.practicas; return pr.length ? pr.length + ' prácticas, última ' + pr[pr.length-1].puntaje + '/10' : null; }
+    case 'ruta': { const mi = METAS[metaActualIdx()]; return `Meta actual ${fmt(mi.meta)} al mes, ${fmt(ingresosMes())} logrados este mes, ${Object.keys(a.ruta.logradas).length} metas alcanzadas`; }
+    case 'shark': { const s = superados(); return s ? `${rangoActual().em} ${rangoActual().nombre}: ${s} de 9 retos, ${xpTotal()} XP` : null; }
+    case 'lanza': { const L = a.lanzamiento; return `${L.contactos} contactos, ${L.clientes} clientes, ${L.numVentas} ventas (${L.ingresos.toLocaleString('es')})`; }
+  }
+}
+function renderProyecto(){
+  const body = $('#projectBody'); body.replaceChildren();
+  const pct = progreso();
+  body.append(el('div', {class:'overall'},
+    el('div', {class:'meter-row'}, el('span', {class:'big'}, pct + '%'), meter(pct, 'gold'))));
+  AREAS.forEach(a => {
+    const done = hecho(a.id), ok = disponible(a), res = resumenArea(a.id);
+    body.append(el('div', {class:'pstage' + (done ? ' done' : '')},
+      el('span', {class:'n'}, done ? '✓' : a.n),
+      el('div', {},
+        el('h3', {}, a.nombre),
+        res ? el('div', {class:'saved'}, res) : el('p', {}, ok ? 'Aún sin empezar.' : 'Se desbloquea al completar el paso anterior.'),
+        ok ? el('button', {class:'linkbtn', type:'button', style:'margin-top:6px;font-size:.9rem', onclick:()=>{ $('#projectDlg').close(); ir(a.id); }}, done ? 'Ver' : 'Ir ahora') : null)));
+  });
+  body.append(el('p', {class:'storage-note'}, Store.label()));
+  if (proyecto.etapas.diagnostico){
+    body.append(el('button', {class:'danger-link', type:'button', onclick: async () => {
+      if (!await confirmar('¿Borrar todo Mi Proyecto? Esta acción no se puede deshacer.')) return;
+      proyecto = proyectoVacio(); await persistir(true);
+      analisisActual = null; caminoSeleccionado = null; ui.sim = null; ui.shark = null; ui.ruta = null;
+      fillForm({ puntoPartida:'', habilidades:'', experiencia:'', ideaActual:'', objetivoTipo:'', meta:'', tiempo:'', presupuesto:'' });
+      $('#result').classList.remove('on'); $('#result').replaceChildren();
+      $('#projectDlg').close(); ir('diagnostico'); toast('Mi Proyecto borrado');
+    }}, 'Empezar de nuevo'));
+  }
+}
+function abrirProyecto(){ renderProyecto(); $('#projectDlg').showModal(); }
+$('#openProject').addEventListener('click', abrirProyecto);
+$('#closeDlg').addEventListener('click', () => $('#projectDlg').close());
+$('#projectDlg').addEventListener('click', e => { if (e.target.id === 'projectDlg') $('#projectDlg').close(); });
+
+/* =========================================================
+   ARRANQUE
+   ========================================================= */
+renderRail();
+(async () => {
+  const cl = window.claude;
+  const sampleP = (cl && cl.use) ? cl.use('sample').catch(() => null) : Promise.resolve(null);
+  await Store.init();
+  const guardado = await Store.load();
+  if (guardado){
+    proyecto = migrar(guardado);
+    const d = proyecto.etapas.diagnostico;
+    if (d){
+      fillForm(d.respuestas || {});
+      analisisActual = d.analisis; caminoSeleccionado = d.caminoElegido?.id || null;
+      renderResultado(false);
+      const siguienteArea = AREAS.find(a => a.id !== 'diagnostico' && !a.extra && disponible(a) && !hecho(a.id));
+      ir(siguienteArea ? siguienteArea.id : 'lanza');
+    }
+    renderRail();
+  }
+  sample = await sampleP;
+  if (!sample) $('#formNote').textContent = 'El análisis con IA no está disponible en esta vista.';
+})();
+</script>
+</body>
+</html>
